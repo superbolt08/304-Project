@@ -38,17 +38,27 @@ String pw = "304#sa#pw";
 	
 //prepare connect
 try (Connection con = DriverManager.getConnection(url, uid, pw);
-     PreparedStatement stmt = con.prepareStatement("SELECT productName FROM product");
+     PreparedStatement stmt = con.prepareStatement("SELECT productId, productName, productPrice FROM product");
      ResultSet rst = stmt.executeQuery()) {	
 	
 	// Print header
 	out.println("<h2>Products</h2>");
+
+	NumberFormat currFormat = NumberFormat.getCurrencyInstance(); // Format currency
 	
 	// Process the result set and print it out
 	while (rst.next()) {
 		// Print product names from the result set
+		int productId = rst.getInt("productId");
 		String productName = rst.getString("productName");
-		out.println("<p>" + productName + "</p>");
+		double productPrice = rst.getDouble("productPrice");
+
+		// Format the price
+		String formattedPrice = currFormat.format(productPrice);
+
+		String link = "addcart.jsp?id=" + productId + "&name=" + URLEncoder.encode(productName, "UTF-8") + "&price=" + productPrice;
+		out.println("<p><a href=\"" + link + "\">" + productName + " - " + formattedPrice + "</a></p>");
+
 	}
 }
 catch (SQLException ex) {
@@ -56,15 +66,8 @@ catch (SQLException ex) {
 }
 
 
-//TODO: 
+//TODO: All done
 
-// For each product create a link of the form
-// addcart.jsp?id=productId&name=productName&price=productPrice
-// Close connection
-
-// Useful code for formatting currency values:
-// NumberFormat currFormat = NumberFormat.getCurrencyInstance();
-// out.println(currFormat.format(5.0);	// Prints $5.00
 %>
 
 </body>
