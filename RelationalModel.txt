@@ -1,0 +1,21 @@
+Customer( customerId, firstName, lastName, email, phonenum, address, city, state, postalCode, country, userid, password )
+
+PaymentMethod( paymentMethodId, paymentType, paymentNumber, paymentExpiryDate, customerId )
+
+OrderSummary( orderId, orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId )
+
+Category( categoryId, categoryName )
+
+Product( productId, productName, productPrice, productImageURL, productImage, productDesc, categoryId )
+
+OrderProduct( orderId, productId, quantity, price )
+
+InCart( orderId, productId, quantity, price )
+
+Warehouse( warehouseId, warehouseName )
+
+Shipment( shipmentId, shipmentDate, shipmentDesc, warehouseId )
+
+ProductInventory( productId, warehouseId, quantity, price )
+
+Review( reviewId, reviewRating, reviewDate, customerId, productId, reviewComment )
