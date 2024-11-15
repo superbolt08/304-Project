@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>YOUR NAME Grocery</title>
+<title>Baby Goat Sweaters Shop</title>
 </head>
 <body>
 
@@ -28,12 +28,35 @@ catch (java.lang.ClassNotFoundException e)
 	out.println("ClassNotFoundException: " +e);
 }
 
-// Variable name now contains the search string the user entered
-// Use it to build a query and print out the resultset.  Make sure to use PreparedStatement!
 
-// Make the connection
+// Question starts here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-// Print out the ResultSet
+// connection details
+String url = "jdbc:sqlserver://localhost;databaseName=WorksOn;TrustServerCertificate=True";		
+String uid = "sa";
+String pw = "304#sa#pw";
+	
+//prepare connect
+try (Connection con = DriverManager.getConnection(url, uid, pw);
+     PreparedStatement stmt = con.prepareStatement("SELECT productName FROM product");
+     ResultSet rst = stmt.executeQuery()) {	
+	
+	// Print header
+	out.println("<h2>Products</h2>");
+	
+	// Process the result set and print it out
+	while (rst.next()) {
+		// Print product names from the result set
+		String productName = rst.getString("productName");
+		out.println("<p>" + productName + "</p>");
+	}
+}
+catch (SQLException ex) {
+	System.err.println("SQLException: " + ex);
+}
+
+
+//TODO: 
 
 // For each product create a link of the form
 // addcart.jsp?id=productId&name=productName&price=productPrice
