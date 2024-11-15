@@ -26,6 +26,25 @@ catch (java.lang.ClassNotFoundException e)
 // out.println(currFormat.format(5.0);  // Prints $5.00
 
 // Make connection
+String url = "jdbc:sqlserver://localhost;databaseName=WorksOn;TrustServerCertificate=True";		
+String uid = "sa";
+String pw = "304#sa#pw";
+	
+try ( Connection con = DriverManager.getConnection(url, uid, pw);
+		Statement stmt = con.createStatement();) 
+{	
+	// Write query to retrieve all order summary records
+	String query = "SELECT * FROM ordersummary";
+	ResultSet rst = stmt.executeQuery(query);
+	out.println("<h2>Order Id	Order Date	Customer Id	Customer Name	Total Amount</h2>")
+	while (rst.next()) {
+		out.println("")
+	}
+}
+catch (SQLException ex)
+{
+	System.err.println("SQLException: " + ex);
+}
 
 // Write query to retrieve all order summary records
 
