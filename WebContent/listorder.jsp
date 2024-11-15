@@ -26,7 +26,7 @@ catch (java.lang.ClassNotFoundException e)
 // out.println(currFormat.format(5.0));  // Prints $5.00
 
 // Make connection
-String url = "jdbc:sqlserver://localhost;databaseName=WorksOn;TrustServerCertificate=True";		
+String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
 String uid = "sa";
 String pw = "304#sa#pw";
 
@@ -34,6 +34,14 @@ String pw = "304#sa#pw";
 try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		Statement stmt = con.createStatement();) 
 {	
+	if(con != null){
+		out.println("<p>good</p>");
+	}
+	else{
+		out.println("<p>bad</p>");
+	}
+
+
 	// Write query to retrieve all order summary records
 	String query = "SELECT orderId, orderDate, c.customerId, c.cname, totalAmount"
 				+ " FROM ordersummary o JOIN customer c ON c.customer = o.customer";
@@ -50,10 +58,11 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+cname+"</td></tr>");
 
 		String query2 = "SELECT productId, quantity, price FROM orderProduct WHERE orderId = ?";
-		try(PreparedStatement pstmt = con.prepareStatement(query2);
-			pstmt.setInt(1, orderId);
-			ResultSet rst2 = pstmt.executeQuery();)
+		try(PreparedStatement pstmt = con.prepareStatement(query2))
 		{
+			pstmt.setInt(1, orderId);
+			ResultSet rst2 = pstmt.executeQuery();
+
 			while (rst2.next()) {
 				int pid = rst2.getInt(1);
 				int quantity = rst2.getInt(2);
