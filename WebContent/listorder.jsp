@@ -5,12 +5,19 @@
 <html>
 <head>
 <title>YOUR NAME Grocery Order List</title>
+<style>
+	table, th, td {
+  		border:1px solid black;
+	}
+</style>
 </head>
 <body>
 
 <h1>Order List</h1>
 
 <%
+out.println("<table width: 100%;><th>Order Id</th><th>Order Date</th><th>Customer Id</th><th>Customer Name</th><th>Total Amount</th>");
+
 //Note: Forces loading of SQL Server driver
 try
 {	// Load driver class
@@ -46,8 +53,6 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 	String query = "SELECT orderId, orderDate, c.customerId, c.cname, totalAmount"
 				+ " FROM ordersummary o JOIN customer c ON c.customer = o.customer";
 	ResultSet rst = stmt.executeQuery(query);
-
-	out.println("<tr><th>Order Id</th><th>Order Date</th><th>Customer Id</th><th>Customer Name</th><th>Total Amount</th></tr>");
 
 	while (rst.next()) {
 		int orderId = rst.getInt(1);
@@ -95,6 +100,8 @@ catch (SQLException e1)
 		// Write out product information 
 
 // Close connection
+
+out.println("</table>");
 %>
 
 </body>
