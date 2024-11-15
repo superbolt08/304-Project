@@ -58,13 +58,14 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 				int pid = rst2.getInt(1);
 				int quantity = rst2.getInt(2);
 				double price = rst2.getDouble(3);
+				NumberFormat currFormat = NumberFormat.getCurrencyInstance();
 
 				out.println("<tr><td>"+pid+"</td><td>"+quantity+"</td><td>"+currFormat.format(price)+"</td></tr>");
 			}
 		}
 		catch(SQLException e2)
 		{
-			System.err.println("SQLException: " + e2)
+			System.err.println("SQLException: " + e2);
 		}
 
 	}
