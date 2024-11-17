@@ -60,8 +60,7 @@ Statement stmt = con.createStatement();)
 	}
 
 	// Save order information to database
-	String query = "INSERT INTO "
-
+	String sql = "SELECT orderId FROM ...";
 		/*
 		// Use retrieval of auto-generated keys.
 		PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
@@ -69,9 +68,13 @@ Statement stmt = con.createStatement();)
 		keys.next();
 		int orderId = keys.getInt(1);
 		*/
+	PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
+	ResultSet keys = pstmt.getGeneratedKeys();
+	keys.next();
+	int orderId = keys.getInt(1);
 
 	// Insert each item into OrderProduct table using OrderId from previous INSERT
-
+	String query = "INSERT INTO OrderProduct VALUES"
 	// Update total amount for order record
 
 	// Here is the code to traverse through a HashMap
