@@ -37,6 +37,8 @@ String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustS
 String uid = "sa";
 String pw = "304#sa#pw";
 
+NumberFormat currFormat = NumberFormat.getCurrencyInstance();
+
 // auto-closes connection with try-catch-with-resource
 try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		Statement stmt = con.createStatement();) 
@@ -58,11 +60,11 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		int orderId = rst.getInt(1);
 		Date orderDate = rst.getDate(2);
 		int cid = rst.getInt(3);
-		String cname = rst.getString(4);
+		String fullName = rst.getString(4);
 		double totalAmount = rst.getDouble(5);
 		
 		
-		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+cname+"</td></tr>");
+		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+fullName+"</td><td>"+currFormat.format(totalAmount)+"</td></tr>");
 
 		String query2 = "SELECT productId, quantity, price FROM orderProduct WHERE orderId = ?";
 		try(PreparedStatement pstmt = con.prepareStatement(query2))
@@ -74,7 +76,6 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 				int pid = rst2.getInt(1);
 				int quantity = rst2.getInt(2);
 				double price = rst2.getDouble(3);
-				NumberFormat currFormat = NumberFormat.getCurrencyInstance();
 
 				out.println("<tr><td>"+pid+"</td><td>"+quantity+"</td><td>"+currFormat.format(price)+"</td></tr>");
 			}
@@ -88,8 +89,8 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 }
 catch (SQLException e1)
 {
-	// System.err.println("SQLException: " + e1);
-	out.println("<p>SQLException: " + e1.getMessage() + "</p>");
+	System.err.println("SQLException: " + e1);
+	//out.println("<p>SQLException: " + e1.getMessage() + "</p>");
 }
 
 // Write query to retrieve all order summary records
