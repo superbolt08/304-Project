@@ -18,7 +18,28 @@ String custId = request.getParameter("customerId");
 @SuppressWarnings({"unchecked"})
 HashMap<String, ArrayList<Object>> productList = (HashMap<String, ArrayList<Object>>) session.getAttribute("productList");
 
-// Determine if valid customer id was entered
+try ( Connection con = DriverManager.getConnection(url, uid, pw);
+Statement stmt = con.createStatement();) 
+{
+	// Determine if valid customer id was entered
+	String getCid = "SELECT customerId AS cid FROM customer";	//get all customer id from db
+	ResultSet rst = stmt.executeQuery(getCid);
+
+	boolean custIdExists = false;
+
+	//iterate throguh customer ids and see if any match the user input
+	while (rst.next()) {
+		String cid = String.valueOf(rst.getInt(1));
+		if(cid.equals(custId)){
+			custIdExists = true;
+			break;
+		}
+	}
+}
+catch (SQLException e1)
+{
+	System.err.println("SQLException: " + e1);
+}
 // Determine if there are products in the shopping cart
 // If either are not true, display an error message
 
