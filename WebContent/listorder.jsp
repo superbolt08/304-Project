@@ -50,8 +50,8 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 
 
 	// Write query to retrieve all order summary records
-	String query = "SELECT orderId, orderDate, c.customerId, c.cname, totalAmount"
-				+ " FROM ordersummary o JOIN customer c ON c.customer = o.customer";
+	String query = "SELECT orderId, orderDate, c.customerId, (c.firstName + ' ' + c.lastName) AS fullName, totalAmount"
+				+ " FROM ordersummary o JOIN customer c ON c.customerId = o.customerId";
 	ResultSet rst = stmt.executeQuery(query);
 
 	while (rst.next()) {
@@ -59,6 +59,8 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		Date orderDate = rst.getDate(2);
 		int cid = rst.getInt(3);
 		String cname = rst.getString(4);
+		double totalAmount = rst.getDouble(5);
+		
 		
 		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+cname+"</td></tr>");
 
@@ -86,7 +88,8 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 }
 catch (SQLException e1)
 {
-	System.err.println("SQLException: " + e1);
+	// System.err.println("SQLException: " + e1);
+	out.println("<p>SQLException: " + e1.getMessage() + "</p>");
 }
 
 // Write query to retrieve all order summary records
