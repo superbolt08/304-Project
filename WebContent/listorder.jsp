@@ -59,8 +59,8 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+fullName+"</td><td>"+currFormat.format(totalAmount)+"</td></tr>");	
 		
 		// sub table
-		out.println("<tr align='right'><td colspan='4'>"); //fixed syntax errors here
-		out.println("<table><th>Product Id</th><th>Quantity</th><th>Price</th>"); // and here as well
+		out.println("<tr align='right'><td colspan='4'>");
+		out.println("<table><th>Product Id</th><th>Quantity</th><th>Price</th>");
 		
 		String query2 = "SELECT productId, quantity, price FROM orderProduct WHERE orderId = ?";
 		try(PreparedStatement pstmt = con.prepareStatement(query2))

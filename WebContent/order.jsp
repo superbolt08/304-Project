@@ -18,6 +18,11 @@ String custId = request.getParameter("customerId");
 @SuppressWarnings({"unchecked"})
 HashMap<String, ArrayList<Object>> productList = (HashMap<String, ArrayList<Object>>) session.getAttribute("productList");
 
+// Make connection
+String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+String uid = "sa";
+String pw = "304#sa#pw";
+
 try ( Connection con = DriverManager.getConnection(url, uid, pw);
 Statement stmt = con.createStatement();) 
 {
@@ -26,8 +31,9 @@ Statement stmt = con.createStatement();)
 	ResultSet rst = stmt.executeQuery(getCid);
 
 	boolean custIdExists = false;
+	boolean prodListNotEmpty = false;
 
-	//iterate throguh customer ids and see if any match the user input
+	//iterate through customer ids and see if any match the user input
 	while (rst.next()) {
 		String cid = String.valueOf(rst.getInt(1));
 		if(cid.equals(custId)){
@@ -35,12 +41,29 @@ Statement stmt = con.createStatement();)
 			break;
 		}
 	}
+	if (productList != null) {	// Determine if there are products in the shopping cart
+		prodListNotEmpty = true;
+	}
+
+	// remove later, just for trouble shooting
+	if (custIdExists && prodListNotEmpty) {
+		out.println("<p>both exist</p>");
+	}
+	else if(custIdExists){
+		out.println("<p>custId exist but cart empty?</p>");
+	}
+	else if(prodListNotEmpty){
+		out.println("<p>cart not empty but cust id not valid?</p>");
+	}
+	else {
+		out.println("<p>this aint good. We're cooked</p>");
+	}
 }
 catch (SQLException e1)
 {
 	System.err.println("SQLException: " + e1);
 }
-// Determine if there are products in the shopping cart
+
 // If either are not true, display an error message
 
 // Make connection
