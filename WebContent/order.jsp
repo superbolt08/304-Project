@@ -58,6 +58,43 @@ Statement stmt = con.createStatement();)
 	else {
 		out.println("<p>this aint good. We're cooked</p>");
 	}
+
+	// Save order information to database
+	String query = "INSERT INTO "
+
+		/*
+		// Use retrieval of auto-generated keys.
+		PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
+		ResultSet keys = pstmt.getGeneratedKeys();
+		keys.next();
+		int orderId = keys.getInt(1);
+		*/
+
+	// Insert each item into OrderProduct table using OrderId from previous INSERT
+
+	// Update total amount for order record
+
+	// Here is the code to traverse through a HashMap
+	// Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
+
+	/*
+		Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
+		while (iterator.hasNext())
+		{ 
+			Map.Entry<String, ArrayList<Object>> entry = iterator.next();
+			ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
+			String productId = (String) product.get(0);
+			String price = (String) product.get(2);
+			double pr = Double.parseDouble(price);
+			int qty = ( (Integer)product.get(3)).intValue();
+				...
+		}
+	*/
+
+	// Print out order summary
+
+	// Clear cart if order placed successfully
+
 }
 catch (SQLException e1)
 {
@@ -68,41 +105,7 @@ catch (SQLException e1)
 
 // Make connection
 
-// Save order information to database
 
-
-	/*
-	// Use retrieval of auto-generated keys.
-	PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
-	ResultSet keys = pstmt.getGeneratedKeys();
-	keys.next();
-	int orderId = keys.getInt(1);
-	*/
-
-// Insert each item into OrderProduct table using OrderId from previous INSERT
-
-// Update total amount for order record
-
-// Here is the code to traverse through a HashMap
-// Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
-
-/*
-	Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
-	while (iterator.hasNext())
-	{ 
-		Map.Entry<String, ArrayList<Object>> entry = iterator.next();
-		ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
-		String productId = (String) product.get(0);
-        String price = (String) product.get(2);
-		double pr = Double.parseDouble(price);
-		int qty = ( (Integer)product.get(3)).intValue();
-            ...
-	}
-*/
-
-// Print out order summary
-
-// Clear cart if order placed successfully
 %>
 </BODY>
 </HTML>
