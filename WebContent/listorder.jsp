@@ -60,7 +60,7 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		
 		// sub table
 		out.println("<tr align='right'><td colspan='4'>"); //fixed syntax errors here
-		out.println("<table style='width: 100%;'><th>Product Id</th><th>Quantity</th><th>Price</th>"); // and here as well
+		out.println("<table><th>Product Id</th><th>Quantity</th><th>Price</th>"); // and here as well
 		
 		String query2 = "SELECT productId, quantity, price FROM orderProduct WHERE orderId = ?";
 		try(PreparedStatement pstmt = con.prepareStatement(query2))
