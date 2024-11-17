@@ -56,9 +56,12 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		String fullName = rst.getString(4);
 		double totalAmount = rst.getDouble(5);
 		
+		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+fullName+"</td><td>"+currFormat.format(totalAmount)+"</td></tr>");	
 		
-		out.println("<tr><td>"+orderId+"</td><td>"+orderDate+"</td><td>"+cid+"</td><td>"+fullName+"</td><td>"+currFormat.format(totalAmount)+"</td></tr>");
-
+		// sub table
+		out.println("<tr align="right"><td colspan="4">")
+		out.println("<table width: 100%;><th>Product Id</th><th>Quantity</th><th>Customer Id</th><th>Price</th>");
+		
 		String query2 = "SELECT productId, quantity, price FROM orderProduct WHERE orderId = ?";
 		try(PreparedStatement pstmt = con.prepareStatement(query2))
 		{
@@ -77,7 +80,8 @@ try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		{
 			System.err.println("SQLException: " + e2);
 		}
-
+		out.println("</table>");
+		out.println("</td></tr>");
 	}
 }
 catch (SQLException e1)
