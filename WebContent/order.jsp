@@ -64,7 +64,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 	int orderId = keys.getInt(1);
 
 	// Insert each item into OrderProduct table using OrderId from previous INSERT
-	String query = "INSERT INTO OrderProduct VALUES ...";
+	String query = "INSERT INTO OrderProduct VALUES ("+orderId+", "+productId+", "+quantity+", "+price+")";
 	// Update total amount for order record
 
 	// Here is the code to traverse through a HashMap
