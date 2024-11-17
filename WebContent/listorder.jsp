@@ -43,13 +43,6 @@ NumberFormat currFormat = NumberFormat.getCurrencyInstance();
 try ( Connection con = DriverManager.getConnection(url, uid, pw);
 		Statement stmt = con.createStatement();) 
 {	
-	if(con != null){
-		out.println("<p>good</p>");
-	}
-	else{
-		out.println("<p>bad</p>");
-	}
-
 
 	// Write query to retrieve all order summary records
 	String query = "SELECT orderId, orderDate, c.customerId, (c.firstName + ' ' + c.lastName) AS fullName, totalAmount"
