@@ -23,41 +23,31 @@ String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustS
 String uid = "sa";
 String pw = "304#sa#pw";
 
-try ( Connection con = DriverManager.getConnection(url, uid, pw);
-Statement stmt = con.createStatement();) 
-{
-	// Determine if valid customer id was entered
-	String getCid = "SELECT customerId AS cid FROM customer";	//get all customer id from db
-	ResultSet rst = stmt.executeQuery(getCid);
+boolean custIdExists = false;
+boolean prodListNotEmpty = (productList != null && !productList.isEmpty());
+int orderId = 0;
+double totalAmount = 0.0;
 
-	boolean custIdExists = false;
-	boolean prodListNotEmpty = false;
+try (Connection con = DriverManager.getConnection(url, uid, pw)) {
+    // Step 1: Validate Customer ID
+    String getCid = "SELECT customerId FROM customer WHERE customerId = ?"; //usesa parmeter instead of a search
+    try (PreparedStatement pstmt = con.prepareStatement(getCid)) {
+        pstmt.setInt(1, Integer.parseInt(custId));
+        ResultSet rst = pstmt.executeQuery();
+        if (rst.next()) {
+            custIdExists = true;
+        }
+    }
 
-	//iterate through customer ids and see if any match the user input
-	while (rst.next()) {
-		String cid = String.valueOf(rst.getInt(1));
-		if(cid.equals(custId)){
-			custIdExists = true;
-			break;
-		}
-	}
-	if (productList != null) {	// Determine if there are products in the shopping cart
-		prodListNotEmpty = true;
-	}
+    if (!custIdExists) {
+        out.println("<p>Invalid Customer ID. Please try again.</p>");
+        return;
+    }
 
-	// remove later, just for trouble shooting
-	if (custIdExists && prodListNotEmpty) {
-		out.println("<p>both exist</p>");
-	}
-	else if(custIdExists){
-		out.println("<p>custId exist but cart empty?</p>");
-	}
-	else if(prodListNotEmpty){
-		out.println("<p>cart not empty but cust id not valid?</p>");
-	}
-	else {
-		out.println("<p>this aint good. We're cooked</p>");
-	}
+    if (!prodListNotEmpty) {
+        out.println("<p>Your shopping cart is empty. Please add products before checkout.</p>");
+        return;
+    }
 
 	// Save order information to database
 	String sql = "SELECT orderId FROM ...";
