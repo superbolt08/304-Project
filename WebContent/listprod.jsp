@@ -32,17 +32,29 @@ catch (java.lang.ClassNotFoundException e)
 // Question starts here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // connection details
-String url = "jdbc:sqlserver://localhost;databaseName=WorksOn;TrustServerCertificate=True";		
+String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
 String uid = "sa";
 String pw = "304#sa#pw";
+
 	
 //prepare connect
+String query = "SELECT productId, productName, productPrice FROM product";
+if (name != null && !name.trim().isEmpty()) {
+    query += " WHERE productName LIKE ?";
+}
+
 try (Connection con = DriverManager.getConnection(url, uid, pw);
-     PreparedStatement stmt = con.prepareStatement("SELECT productId, productName, productPrice FROM product");
-     ResultSet rst = stmt.executeQuery()) {	
-	
+     PreparedStatement stmt = con.prepareStatement(query)) {
+
+    if (name != null && !name.trim().isEmpty()) {
+        stmt.setString(1, "%" + name + "%");
+    }
+    ResultSet rst = stmt.executeQuery();
+
+
 	// Print header
-	out.println("<h2>Products</h2>");
+    out.println("<h2>Products</h2>");
+    out.println("<table border='1'><tr><th>Product ID</th><th>Product Name</th><th>Price</th></tr>");
 
 	NumberFormat currFormat = NumberFormat.getCurrencyInstance(); // Format currency
 	
@@ -57,10 +69,17 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);
 		String formattedPrice = currFormat.format(productPrice);
 
 		String link = "addcart.jsp?id=" + productId + "&name=" + URLEncoder.encode(productName, "UTF-8") + "&price=" + productPrice;
-		out.println("<p><a href=\"" + link + "\">" + productName + " - " + formattedPrice + "</a></p>");
+		
+		out.println("<tr>");
+        out.println("<td>" + productId + "</td>");
+        out.println("<td><a href=\"" + link + "\">" + productName + "</a></td>");
+        out.println("<td>" + formattedPrice + "</td>");
+        out.println("</tr>");
 
 	}
-}
+	out.println("</table>");
+} 
+
 catch (SQLException ex) {
 	System.err.println("SQLException: " + ex);
 }
