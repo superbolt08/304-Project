@@ -28,6 +28,20 @@ boolean prodListNotEmpty = (productList != null && !productList.isEmpty());
 int orderId = 0;
 double totalAmount = 0.0;
 
+// Declare variables outside the if block to make them accessible beyond the block
+int customerId = 0;
+String firstName = null;
+String lastName = null;
+String email = null;
+String phoneNum = null;
+String address = null;
+String city = null;
+String state = null;
+String postalCode = null;
+String country = null;
+String userId = null;
+String password = null;
+
 try (Connection con = DriverManager.getConnection(url, uid, pw)) {
     // Step 1: Validate Customer ID
     String getCid = "SELECT customerId FROM customer WHERE customerId = ?"; //usesa parmeter instead of a search
@@ -49,25 +63,59 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
         return;
     }
 
-	// Save order information to database
-	String sql = "INSERT INTO ordersummary (orderId, orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	//now that we now customer exists, save customer information
 
-	PreparedStatement pstmt = con.prepareStatement(sql);	
-	pstmt.setInt(1, orderId);  
-	pstmt.setDate(2, new java.sql.Date(orderDate.getTime())); //save date
-	pstmt.setDouble(3, totalAmount); // save total amount
+	String getCid = "SELECT * FROM customer WHERE customerId = ?"; 
+    try (PreparedStatement pstmt = con.prepareStatement(getCid)) {
+        pstmt.setInt(1, Integer.parseInt(custId));
+        ResultSet rst = pstmt.executeQuery();
+        if (rst.next()) {
+			int customerId = rst.getInt("customerId");  // Get the customer ID
+			String firstName = rst.getString("firstName");  // Get the first name
+			String lastName = rst.getString("lastName");  // Get the last name
+			String email = rst.getString("email");  // Get the email address
+			String phoneNum = rst.getString("phonenum");  // Get the phone number
+			String address = rst.getString("address");  // Get the address
+			String city = rst.getString("city");  // Get the city
+			String state = rst.getString("state");  // Get the state
+			String postalCode = rst.getString("postalCode");  // Get the postal code
+			String country = rst.getString("country");  // Get the country
+			String userId = rst.getString("userid");  // Get the user ID
+			String password = rst.getString("password");  // Get the password
+        }
+    }
 
-	// Setting NULL for these shipping address fields, will figure it out later
+		// Save order information to database
+	String sql = "INSERT INTO ordersummary (orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+	PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+	// Set the prepared statement parameters
+	pstmt.setDate(1, new java.sql.Date(orderDate.getTime())); 
+	pstmt.setDouble(2, totalAmount);
+
+	//setting to null for now
 	pstmt.setNull(4, java.sql.Types.VARCHAR);  // Null for shiptoAddress
 	pstmt.setNull(5, java.sql.Types.VARCHAR);  // Null for shiptoCity
 	pstmt.setNull(6, java.sql.Types.VARCHAR);  // Null for shiptoState
 	pstmt.setNull(7, java.sql.Types.VARCHAR);  // Null for shiptoPostalCode
 	pstmt.setNull(8, java.sql.Types.VARCHAR);  // Null for shiptoCountry
 
-	pstmt.setInt(9, customerId);  // Assuming customerId is an integer
+	pstmt.setInt(8, customerId);
 
+	// Execute the insert
 	int rowsInserted = pstmt.executeUpdate();
+
+	// Retrieve the generated orderId
+	if (rowsInserted > 0) {
+		ResultSet rs = pstmt.getGeneratedKeys();
+		if (rs.next()) {
+			int generatedOrderId = rs.getInt(1);  // Get the first generated key (orderId)
+			System.out.println("Generated orderId: " + generatedOrderId);
+		}
+	}
+
 /*
 		// Use retrieval of auto-generated keys.
 		PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
