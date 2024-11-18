@@ -97,12 +97,16 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		pstmt2.set(3, qty);
 		pstmt2.set(4, pr);
 
+		ResultSet rst2 = pstmt2.executeQuery();
+
 		// Update total amount for order record
 		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
 									 + " WHERE orderId = ?";
 		PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount);
 		pstmt3.set(1, pr);
 		pstmt3.set(2, orderId);
+
+		ResultSet rst3 = pstmt3.executeQuery();
 	}
 
 	// Print out order summary
