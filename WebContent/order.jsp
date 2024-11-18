@@ -168,7 +168,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		pstmt2.setInt(3, qty);
 		pstmt2.setDouble(4, pr);
 
-		ResultSet rst2 = pstmt2.executeQuery();
+		//ResultSet rst2 = pstmt2.executeQuery();  				(old)
+		int insertIntoOrderProduct = pstmt2.executeUpdate(); // (new)
 
 		// Update total amount for order record
 		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
@@ -177,7 +178,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		pstmt3.setDouble(1, pr);
 		pstmt3.setInt(2, orderId);
 
-		ResultSet rst3 = pstmt3.executeQuery();
+		//ResultSet rst3 = pstmt3.executeQuery();		   (old)
+		int updateTotalAmount = pstmt3.executeUpdate(); // (new)
 	}
 
 	// Print out order summary
