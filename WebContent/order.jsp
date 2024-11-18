@@ -85,37 +85,41 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
         }
     }
 
-		// Save order information to database
-	String sql = "INSERT INTO ordersummary (orderId, orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	 // Step 3: Save Order Information to the Database
+	 String sql = "INSERT INTO ordersummary (orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-	PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+    try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        // Set the prepared statement parameters
+        pstmt.setDate(1, new java.sql.Date(orderDate.getTime()));  // Assuming orderDate is a java.util.Date object
+        pstmt.setDouble(2, totalAmount);
 
-	// Set the prepared statement parameters
-	ResultSet rs = pstmt.getGeneratedKeys();
-		if (rs.next()) { // auto generate Order id 
-			int generatedOrderId = rs.getInt(1);  // Get the first generated key (orderId)
-			pstmt.setInt(1, generatedOrderId)
-		}
-	pstmt.setDate(2, new java.sql.Date(orderDate.getTime())); 
-	pstmt.setDouble(3, totalAmount);
+        // Setting shipping fields
+        pstmt.setString(3, address);  // shiptoAddress
+        pstmt.setString(4, city);  // shiptoCity
+        pstmt.setString(5, state);  // shiptoState
+        pstmt.setString(6, postalCode);  // shiptoPostalCode
+        pstmt.setString(7, country);  // shiptoCountry
 
+        pstmt.setInt(8, customerId);  // customerId
 
-	pstmt.setString(4, address);  
-	pstmt.setString(5, city);  
-	pstmt.setString(6, state);  
-	pstmt.setString(7, postalCode);  
-	pstmt.setString(8, country);  
+        // Execute the insert and retrieve the generated orderId
+        int rowsInserted = pstmt.executeUpdate();
 
-	pstmt.setInt(9, customerId);
-
-	// Execute the insert
-	int rowsInserted = pstmt.executeUpdate();
-
-	// Retrieve the generated orderId
-	if (rowsInserted > 0) {
-		
+        // Retrieve the generated orderId after the insert
+        if (rowsInserted > 0) {
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                int generatedOrderId = rs.getInt(1);  // Get the first generated key (orderId)
+                System.out.println("Generated orderId: " + generatedOrderId);
+            }
+        }
+    }
+	} catch (SQLException e) {
+		e.printStackTrace();  // Add proper error handling
 	}
+
+	
 
 /*
 		// Use retrieval of auto-generated keys.
