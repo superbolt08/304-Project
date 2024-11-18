@@ -165,7 +165,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct);
 		pstmt2.setInt(1, orderId);
 		pstmt2.setString(2, productId);
-		pstmt2.seInt(3, qty);
+		pstmt2.setInt(3, qty);
 		pstmt2.setDouble(4, pr);
 
 		ResultSet rst2 = pstmt2.executeQuery();
