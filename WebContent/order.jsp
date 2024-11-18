@@ -128,10 +128,10 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		keys.next();
 		int orderId = keys.getInt(1);
 		*/
-	PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
-	ResultSet keys = pstmt.getGeneratedKeys();
-	keys.next();
-	int orderId = keys.getInt(1);
+	// PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
+	// ResultSet keys = pstmt.getGeneratedKeys();
+	// keys.next();
+	// int orderId = keys.getInt(1);
 
 	// Here is the code to traverse through a HashMap
 	// Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
