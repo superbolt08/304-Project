@@ -50,8 +50,25 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
     }
 
 	// Save order information to database
-	String sql = "SELECT orderId FROM ...";
-		/*
+	String sql = "INSERT INTO ordersummary (orderId, orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	PreparedStatement pstmt = con.prepareStatement(sql);	
+	pstmt.setInt(1, orderId);  
+	pstmt.setDate(2, new java.sql.Date(orderDate.getTime())); //save date
+	pstmt.setDouble(3, totalAmount); // save total amount
+
+	// Setting NULL for these shipping address fields, will figure it out later
+	pstmt.setNull(4, java.sql.Types.VARCHAR);  // Null for shiptoAddress
+	pstmt.setNull(5, java.sql.Types.VARCHAR);  // Null for shiptoCity
+	pstmt.setNull(6, java.sql.Types.VARCHAR);  // Null for shiptoState
+	pstmt.setNull(7, java.sql.Types.VARCHAR);  // Null for shiptoPostalCode
+	pstmt.setNull(8, java.sql.Types.VARCHAR);  // Null for shiptoCountry
+
+	pstmt.setInt(9, customerId);  // Assuming customerId is an integer
+
+	int rowsInserted = pstmt.executeUpdate();
+/*
 		// Use retrieval of auto-generated keys.
 		PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);			
 		ResultSet keys = pstmt.getGeneratedKeys();
