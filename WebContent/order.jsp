@@ -160,6 +160,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		int qty = ( (Integer)product.get(3)).intValue();
 		
 		// Insert each item into OrderProduct table using OrderId from previous INSERT
+		String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
+										  + " VALUES (?, ?, ?, ?)";
 		try (PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct)) {
             pstmt2.setInt(1, orderId);
             pstmt2.setString(2, productId);
@@ -171,17 +173,25 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
             if (rowsInserted > 0) {
                 System.out.println("Inserted productId: " + productId + " with quantity: " + qty);
             }
-        }
+
+        }catch(SQLException e){
+			System.err.println("SQLException: " + e);
+		}
 
 		// Update total amount for order record
 		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
 									 + " WHERE orderId = ?";
-		PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount);
-		pstmt3.setDouble(1, pr);
-		pstmt3.setInt(2, orderId);
+		try(PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount)){
+			pstmt3.setDouble(1, pr);
+			pstmt3.setInt(2, orderId);
 
-		//ResultSet rst3 = pstmt3.executeQuery();		   (old)
-		int updateTotalAmount = pstmt3.executeUpdate(); // (new)
+			//execute the update
+			int rowsUpdated = pstmt3.executeUpdate(); 		// (new)
+
+		}catch(SQLException e){
+			System.err.println("SQLException: " + e);
+		}
+		
 	}
 
 	// Print out order summary
