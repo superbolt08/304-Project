@@ -183,7 +183,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 
 	// Clear cart if order placed successfully
 
-}
+
 catch (SQLException e1)
 {
 	System.err.println("SQLException: " + e1);
