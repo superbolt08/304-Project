@@ -160,16 +160,18 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		int qty = ( (Integer)product.get(3)).intValue();
 		
 		// Insert each item into OrderProduct table using OrderId from previous INSERT
-		String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
-										  + " VALUES (?, ?, ?, ?)";
-		PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct);
-		pstmt2.setInt(1, orderId);
-		pstmt2.setString(2, productId);
-		pstmt2.setInt(3, qty);
-		pstmt2.setDouble(4, pr);
+		try (PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct)) {
+            pstmt2.setInt(1, orderId);
+            pstmt2.setString(2, productId);
+            pstmt2.setInt(3, qty);
+            pstmt2.setDouble(4, pr);
 
-		//ResultSet rst2 = pstmt2.executeQuery();  				(old)
-		int insertIntoOrderProduct = pstmt2.executeUpdate(); // (new)
+            // Execute the insert
+            int rowsInserted = pstmt2.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Inserted productId: " + productId + " with quantity: " + qty);
+            }
+        }
 
 		// Update total amount for order record
 		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
