@@ -41,6 +41,7 @@ String postalCode = null;
 String country = null;
 String userId = null;
 String password = null;
+Date orderDate = null;
 
 try (Connection con = DriverManager.getConnection(url, uid, pw)) {
     // Step 1: Validate Customer ID
