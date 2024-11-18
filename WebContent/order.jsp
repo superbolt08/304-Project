@@ -65,55 +65,56 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 
 	//now that we now customer exists, save customer information
 
-	String getCid = "SELECT * FROM customer WHERE customerId = ?"; 
-    try (PreparedStatement pstmt = con.prepareStatement(getCid)) {
+	String customerInformation = "SELECT * FROM customer WHERE customerId = ?"; 
+    try (PreparedStatement pstmt = con.prepareStatement(customerInformation)) {
         pstmt.setInt(1, Integer.parseInt(custId));
         ResultSet rst = pstmt.executeQuery();
         if (rst.next()) {
-			int customerId = rst.getInt("customerId");  // Get the customer ID
-			String firstName = rst.getString("firstName");  // Get the first name
-			String lastName = rst.getString("lastName");  // Get the last name
-			String email = rst.getString("email");  // Get the email address
-			String phoneNum = rst.getString("phonenum");  // Get the phone number
-			String address = rst.getString("address");  // Get the address
-			String city = rst.getString("city");  // Get the city
-			String state = rst.getString("state");  // Get the state
-			String postalCode = rst.getString("postalCode");  // Get the postal code
-			String country = rst.getString("country");  // Get the country
-			String userId = rst.getString("userid");  // Get the user ID
-			String password = rst.getString("password");  // Get the password
+			customerId = rst.getInt("customerId");  // Get the customer ID
+			firstName = rst.getString("firstName");  // Get the first name
+			lastName = rst.getString("lastName");  // Get the last name
+			email = rst.getString("email");  // Get the email address
+			phoneNum = rst.getString("phonenum");  // Get the phone number
+			address = rst.getString("address");  // Get the address
+			city = rst.getString("city");  // Get the city
+			state = rst.getString("state");  // Get the state
+			postalCode = rst.getString("postalCode");  // Get the postal code
+			country = rst.getString("country");  // Get the country
+			userId = rst.getString("userid");  // Get the user ID
+			password = rst.getString("password");  // Get the password
         }
     }
 
 		// Save order information to database
-	String sql = "INSERT INTO ordersummary (orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	String sql = "INSERT INTO ordersummary (orderId, orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 	// Set the prepared statement parameters
-	pstmt.setDate(1, new java.sql.Date(orderDate.getTime())); 
-	pstmt.setDouble(2, totalAmount);
+	ResultSet rs = pstmt.getGeneratedKeys();
+		if (rs.next()) { // auto generate Order id 
+			int generatedOrderId = rs.getInt(1);  // Get the first generated key (orderId)
+			pstmt.setInt(1, generatedOrderId)
+		}
+	pstmt.setDate(2, new java.sql.Date(orderDate.getTime())); 
+	pstmt.setDouble(3, totalAmount);
 
-	//setting to null for now
-	pstmt.setNull(4, java.sql.Types.VARCHAR);  // Null for shiptoAddress
-	pstmt.setNull(5, java.sql.Types.VARCHAR);  // Null for shiptoCity
-	pstmt.setNull(6, java.sql.Types.VARCHAR);  // Null for shiptoState
-	pstmt.setNull(7, java.sql.Types.VARCHAR);  // Null for shiptoPostalCode
-	pstmt.setNull(8, java.sql.Types.VARCHAR);  // Null for shiptoCountry
 
-	pstmt.setInt(8, customerId);
+	pstmt.setString(4, address);  
+	pstmt.setString(5, city);  
+	pstmt.setString(6, state);  
+	pstmt.setString(7, postalCode);  
+	pstmt.setString(8, country);  
+
+	pstmt.setInt(9, customerId);
 
 	// Execute the insert
 	int rowsInserted = pstmt.executeUpdate();
 
 	// Retrieve the generated orderId
 	if (rowsInserted > 0) {
-		ResultSet rs = pstmt.getGeneratedKeys();
-		if (rs.next()) {
-			int generatedOrderId = rs.getInt(1);  // Get the first generated key (orderId)
-			System.out.println("Generated orderId: " + generatedOrderId);
-		}
+		
 	}
 
 /*
