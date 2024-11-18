@@ -90,7 +90,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		
 		// Insert each item into OrderProduct table using OrderId from previous INSERT
 		String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
-										   + " VALUES (?, ?, ?, ?)";
+										  + " VALUES (?, ?, ?, ?)";
 		PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct);
 		pstmt2.set(1, orderId);
 		pstmt2.set(2, productId);
@@ -98,9 +98,11 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		pstmt2.set(4, pr);
 
 		// Update total amount for order record
-		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?";
+		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
+									 + " WHERE orderId = ?";
 		PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount);
 		pstmt3.set(1, pr);
+		pstmt3.set(2, orderId);
 	}
 
 	// Print out order summary
