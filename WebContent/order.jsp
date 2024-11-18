@@ -63,14 +63,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 	keys.next();
 	int orderId = keys.getInt(1);
 
-	// Insert each item into OrderProduct table using OrderId from previous INSERT
-	String query = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
-				+ " VALUES (?, ?, ?, ?)";
-	// Update total amount for order record
-
 	// Here is the code to traverse through a HashMap
 	// Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
-
 	/*
 		Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
 		while (iterator.hasNext())
@@ -84,6 +78,30 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 				...
 		}
 	*/
+	Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
+	while (iterator.hasNext())
+	{ 
+		Map.Entry<String, ArrayList<Object>> entry = iterator.next();
+		ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
+		String productId = (String) product.get(0);
+		String price = (String) product.get(2);
+		double pr = Double.parseDouble(price);
+		int qty = ( (Integer)product.get(3)).intValue();
+		
+		// Insert each item into OrderProduct table using OrderId from previous INSERT
+		String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
+										   + " VALUES (?, ?, ?, ?)";
+		PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct);
+		pstmt2.set(1, orderId);
+		pstmt2.set(2, productId);
+		pstmt2.set(3, qty);
+		pstmt2.set(4, pr);
+
+		// Update total amount for order record
+		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?";
+		PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount);
+		pstmt3.set(1, pr);
+	}
 
 	// Print out order summary
 
