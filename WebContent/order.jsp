@@ -163,10 +163,10 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
 										  + " VALUES (?, ?, ?, ?)";
 		PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct);
-		pstmt2.set(1, orderId);
-		pstmt2.set(2, productId);
-		pstmt2.set(3, qty);
-		pstmt2.set(4, pr);
+		pstmt2.setInt(1, orderId);
+		pstmt2.setString(2, productId);
+		pstmt2.seInt(3, qty);
+		pstmt2.setDouble(4, pr);
 
 		ResultSet rst2 = pstmt2.executeQuery();
 
@@ -174,8 +174,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
 									 + " WHERE orderId = ?";
 		PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount);
-		pstmt3.set(1, pr);
-		pstmt3.set(2, orderId);
+		pstmt3.setDouble(1, pr);
+		pstmt3.setInt(2, orderId);
 
 		ResultSet rst3 = pstmt3.executeQuery();
 	}
