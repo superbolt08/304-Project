@@ -88,36 +88,36 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
         }
     }
 
-	 // Step 3: Save Order Information to the Database
-	 String sql = "INSERT INTO ordersummary (orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			// Step 3: Save Order Information to the Database
+		String sql = "INSERT INTO ordersummary (orderDate, totalAmount, shiptoAddress, shiptoCity, shiptoState, shiptoPostalCode, shiptoCountry, customerId) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+			// Set the prepared statement parameters
+			pstmt.setDate(1, new java.sql.Date(orderDate.getTime()));
+			pstmt.setDouble(2, totalAmount);
+			pstmt.setString(3, address);
+			pstmt.setString(4, city);
+			pstmt.setString(5, state);
+			pstmt.setString(6, postalCode);
+			pstmt.setString(7, country);
+			pstmt.setInt(8, customerId);
 
-    try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-        // Set the prepared statement parameters
-        pstmt.setDate(1, new java.sql.Date(orderDate.getTime()));  // Assuming orderDate is a java.util.Date object
-        pstmt.setDouble(2, totalAmount);
-
-        // Setting shipping fields
-        pstmt.setString(3, address);  // shiptoAddress
-        pstmt.setString(4, city);  // shiptoCity
-        pstmt.setString(5, state);  // shiptoState
-        pstmt.setString(6, postalCode);  // shiptoPostalCode
-        pstmt.setString(7, country);  // shiptoCountry
-
-        pstmt.setInt(8, customerId);  // customerId
-
-        // Execute the insert and retrieve the generated orderId
-        int rowsInserted = pstmt.executeUpdate();
-
-        // Retrieve the generated orderId after the insert
-        if (rowsInserted > 0) {
-            ResultSet rs = pstmt.getGeneratedKeys();
-            if (rs.next()) {
-                int generatedOrderId = rs.getInt(1);  // Get the first generated key (orderId)
-                System.out.println("Generated orderId: " + generatedOrderId);
-            }
-        }
-    }
+			// Execute the insert and retrieve the generated orderId
+			int rowsInserted = pstmt.executeUpdate();
+			if (rowsInserted > 0) {
+				ResultSet rs = pstmt.getGeneratedKeys();
+				if (rs.next()) {
+					orderId = rs.getInt(1);
+					System.out.println("Generated orderId: " + orderId);
+				} else {
+					out.println("<p>Failed to retrieve orderId. Please try again.</p>");
+					return;
+				}
+			} else {
+				out.println("<p>Order insertion failed. Please try again.</p>");
+				return;
+			}
+		}
 	
 
 	
@@ -149,112 +149,83 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 				...
 		}
 	*/
+	out.println("<h1>Your Order Summary</h1>");
+out.println("<table><th>Product Id</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th>");
 
-	out.println("<h1> Your Order Summary </h1>");
-	out.println("<table><th>Product Id</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th>");
-		if (productList != null) {
-			Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
-			while (iterator.hasNext())
-			{ 
-				Map.Entry<String, ArrayList<Object>> entry = iterator.next();
-				ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
-				String productId = (String) product.get(0);
-				String price = (String) product.get(2);
-				double pr = Double.parseDouble(price);
-				int qty = ( (Integer)product.get(3)).intValue();
-				
-				// Insert each item into OrderProduct table using OrderId from previous INSERT
-				String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
-												+ " VALUES (?, ?, ?, ?)";
-				try (PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct)) {
-					pstmt2.setInt(2, productId);
-					pstmt2.setInt(3, qty);
-					pstmt2.setDouble(4, pr);
+// Ensure the product list is not null before processing
+if (productList != null && !productList.isEmpty()) {
+    double grandTotal = 0.0;  // Initialize grand total for all products
 
-					// Execute the insert
-					int rowsInserted = pstmt2.executeUpdate();
-					if (rowsInserted > 0) {
-						ResultSet rs = pstmt.getGeneratedKeys();
-						if (rs.next()) {
-							orderId = rs.getInt(1);  // Assign the generated orderId
-							System.out.println("Generated orderId: " + orderId);
-						}
-						System.out.println("Inserted productId: " + productId + " with quantity: " + qty);
-					}
+    // Process each product in the cart
+    Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
+    while (iterator.hasNext()) {
+        Map.Entry<String, ArrayList<Object>> entry = iterator.next();
+        ArrayList<Object> product = entry.getValue();
 
-				}catch(SQLException e){
-					System.err.println("SQLException: " + e);
-				}
-	}
-		// Update total amount for order record
-		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
-									 + " WHERE orderId = ?";
-		try(PreparedStatement pstmt3 = con.prepareStatement(sql3_UpdateTotalAmount)){
-			pstmt3.setDouble(1, pr);
-			pstmt3.setInt(2, orderId);
+        String productId = (String) product.get(0);
+        String productName = (String) product.get(1);
+        double price = Double.parseDouble((String) product.get(2));
+        int quantity = (Integer) product.get(3);
+        double subtotal = price * quantity;
 
-			//execute the update
-			int rowsUpdated = pstmt3.executeUpdate();
+        // Insert each item into OrderProduct table using the OrderId from the previous insert
+        String insertProductSql = "INSERT INTO OrderProduct (orderId, productId, quantity, price) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement pstmt2 = con.prepareStatement(insertProductSql)) {
+            pstmt2.setInt(1, orderId);  // Ensure the correct orderId is used
+            pstmt2.setString(2, productId);
+            pstmt2.setInt(3, quantity);
+            pstmt2.setDouble(4, price);
 
-		}catch(SQLException e){
-			System.err.println("SQLException: " + e);
-		}
+            // Execute the insert
+            int rowsInserted = pstmt2.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Inserted productId: " + productId + " with quantity: " + quantity);
+            }
+        } catch (SQLException e) {
+            System.err.println("SQLException while inserting product: " + e);
+        }
 
-		// Print out order summary
-		out.println("<h2>Order Summary</h2>");
-		out.println("<table border='1'><tr><th>Product ID</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th></tr>");
+        // Accumulate the subtotal to the grand total
+        grandTotal += subtotal;
 
-		double grandTotal = 0.0;  // Initialize grand total for all products
+        // Display each product's details in the order summary
+        out.println("<tr>");
+        out.println("<td>" + productId + "</td>");
+        out.println("<td>" + productName + "</td>");
+        out.println("<td>" + quantity + "</td>");
+        out.println("<td>" + NumberFormat.getCurrencyInstance().format(price) + "</td>");
+        out.println("<td>" + NumberFormat.getCurrencyInstance().format(subtotal) + "</td>");
+        out.println("</tr>");
+    }
 
-		if (productList != null) {
-			Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<String, ArrayList<Object>> entry = iterator.next();
-				ArrayList<Object> product = entry.getValue();
+    // Update the total amount for the order record
+    String updateTotalSql = "UPDATE orderSummary SET totalAmount = ? WHERE orderId = ?";
+    try (PreparedStatement pstmt3 = con.prepareStatement(updateTotalSql)) {
+        pstmt3.setDouble(1, grandTotal);  // Set the grand total as the updated totalAmount
+        pstmt3.setInt(2, orderId);
 
-				String productId = (String) product.get(0);
-				String productName = (String) product.get(1);
-				double price = Double.parseDouble((String) product.get(2));
-				int quantity = ((Integer) product.get(3)).intValue();
-				double subtotal = price * quantity;
+        // Execute the update
+        int rowsUpdated = pstmt3.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Order total updated successfully.");
+        }
+    } catch (SQLException e) {
+        System.err.println("SQLException while updating total amount: " + e);
+    }
 
-				// Print each product's details in the order summary
-				out.println("<tr>");
-				out.println("<td>" + productId + "</td>");
-				out.println("<td>" + productName + "</td>");
-				out.println("<td>" + quantity + "</td>");
-				out.println("<td>" + NumberFormat.getCurrencyInstance().format(price) + "</td>");
-				out.println("<td>" + NumberFormat.getCurrencyInstance().format(subtotal) + "</td>");
-				out.println("</tr>");
+    // Display the grand total
+    out.println("<tr><td colspan='4'><strong>Grand Total:</strong></td>");
+    out.println("<td><strong>" + NumberFormat.getCurrencyInstance().format(grandTotal) + "</strong></td></tr>");
+    out.println("</table>");
 
-				// Accumulate the subtotal to the grand total
-				grandTotal += subtotal;
-			}
-		}
-
-		// Display the grand total
-		out.println("<tr><td colspan='4'><strong>Grand Total:</strong></td>");
-		out.println("<td><strong>" + NumberFormat.getCurrencyInstance().format(grandTotal) + "</strong></td></tr>");
-		out.println("</table>");
-
-		// Clear cart if order placed successfully
-		out.println("<tr><td colspan='4'><strong>Grand Total:</strong></td>");
-		out.println("<td><strong>" + NumberFormat.getCurrencyInstance().format(grandTotal) + "</strong></td></tr>");
-		out.println("</table>");
-
-		// Step 5: Clear the cart if the order was placed successfully
-		if (orderId > 0) {
-			session.removeAttribute("productList");
-			out.println("<p>Thank you for your order! Your cart has been cleared.</p>");
-		} else {
-			out.println("<p>There was an issue placing your order. Please try again.</p>");
-		}
-	}
-
-	out.println("</table>"); // close ordersummary table
+    // Clear the cart if the order was placed successfully
+    session.removeAttribute("productList");
+    out.println("<p>Thank you for your order! Your cart has been cleared.</p>");
+} else {
+    out.println("<p>Your cart is empty. Please add products before checkout.</p>");
 }
-catch (SQLException e) {
-	e.printStackTrace();  // Add proper error handling
+
+out.println("</table>"); // Close order summary table
 }
 
 // Make connection
