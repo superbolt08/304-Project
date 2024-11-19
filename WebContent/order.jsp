@@ -53,7 +53,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
             custIdExists = true;
         }
     }
-
+	
+	// If either are not true, display an error message
     if (!custIdExists) {
         out.println("<p>Invalid Customer ID. Please try again.</p>");
         return;
@@ -149,6 +150,10 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 				...
 		}
 	*/
+
+	out.println("<h1> Your Order Summary </h1>");
+	out.println("<table><th>Product Id</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th>");
+
 	Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
 	while (iterator.hasNext())
 	{ 
@@ -186,25 +191,25 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 			pstmt3.setInt(2, orderId);
 
 			//execute the update
-			int rowsUpdated = pstmt3.executeUpdate(); 		// (new)
+			int rowsUpdated = pstmt3.executeUpdate();
 
 		}catch(SQLException e){
 			System.err.println("SQLException: " + e);
 		}
+
+		// Print out order summary
+
+
+		// Clear cart if order placed successfully
 		
 	}
 
-	// Print out order summary
-
-	// Clear cart if order placed successfully
-
+	out.println("</table>"); // close ordersummary table
 
 catch (SQLException e1)
 {
 	System.err.println("SQLException: " + e1);
 }
-
-// If either are not true, display an error message
 
 // Make connection
 
