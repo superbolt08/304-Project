@@ -41,7 +41,8 @@ String postalCode = null;
 String country = null;
 String userId = null;
 String password = null;
-Date orderDate = null;
+java.util.Date utilDate = new java.util.Date();
+java.sql.Date orderDate = new java.sql.Date(utilDate.getTime());
 
 try (Connection con = DriverManager.getConnection(url, uid, pw)) {
     // Step 1: Validate Customer ID
@@ -117,9 +118,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
             }
         }
     }
-	} catch (SQLException e) {
-		e.printStackTrace();  // Add proper error handling
-	}
+	
 
 	
 
@@ -153,36 +152,40 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 
 	out.println("<h1> Your Order Summary </h1>");
 	out.println("<table><th>Product Id</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th>");
+		if (productList != null) {
+			Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
+			while (iterator.hasNext())
+			{ 
+				Map.Entry<String, ArrayList<Object>> entry = iterator.next();
+				ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
+				String productId = (String) product.get(0);
+				String price = (String) product.get(2);
+				double pr = Double.parseDouble(price);
+				int qty = ( (Integer)product.get(3)).intValue();
+				
+				// Insert each item into OrderProduct table using OrderId from previous INSERT
+				String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
+												+ " VALUES (?, ?, ?, ?)";
+				try (PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct)) {
+					pstmt2.setInt(2, productId);
+					pstmt2.setInt(3, qty);
+					pstmt2.setDouble(4, pr);
 
-	Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
-	while (iterator.hasNext())
-	{ 
-		Map.Entry<String, ArrayList<Object>> entry = iterator.next();
-		ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
-		String productId = (String) product.get(0);
-		String price = (String) product.get(2);
-		double pr = Double.parseDouble(price);
-		int qty = ( (Integer)product.get(3)).intValue();
-		
-		// Insert each item into OrderProduct table using OrderId from previous INSERT
-		String sql2_InsertIntoOrderProduct = "INSERT INTO OrderProduct (orderId, productId, quantity, price)"
-										  + " VALUES (?, ?, ?, ?)";
-		try (PreparedStatement pstmt2 = con.prepareStatement(sql2_InsertIntoOrderProduct)) {
-            pstmt2.setInt(1, orderId);
-            pstmt2.setString(2, productId);
-            pstmt2.setInt(3, qty);
-            pstmt2.setDouble(4, pr);
+					// Execute the insert
+					int rowsInserted = pstmt2.executeUpdate();
+					if (rowsInserted > 0) {
+						ResultSet rs = pstmt.getGeneratedKeys();
+						if (rs.next()) {
+							orderId = rs.getInt(1);  // Assign the generated orderId
+							System.out.println("Generated orderId: " + orderId);
+						}
+						System.out.println("Inserted productId: " + productId + " with quantity: " + qty);
+					}
 
-            // Execute the insert
-            int rowsInserted = pstmt2.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Inserted productId: " + productId + " with quantity: " + qty);
-            }
-
-        }catch(SQLException e){
-			System.err.println("SQLException: " + e);
-		}
-
+				}catch(SQLException e){
+					System.err.println("SQLException: " + e);
+				}
+	}
 		// Update total amount for order record
 		String sql3_UpdateTotalAmount = "UPDATE orderSummary SET totalAmount = totalAmount + ?"
 									 + " WHERE orderId = ?";
@@ -198,17 +201,60 @@ try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 		}
 
 		// Print out order summary
+		out.println("<h2>Order Summary</h2>");
+		out.println("<table border='1'><tr><th>Product ID</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th></tr>");
 
+		double grandTotal = 0.0;  // Initialize grand total for all products
+
+		if (productList != null) {
+			Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<String, ArrayList<Object>> entry = iterator.next();
+				ArrayList<Object> product = entry.getValue();
+
+				String productId = (String) product.get(0);
+				String productName = (String) product.get(1);
+				double price = Double.parseDouble((String) product.get(2));
+				int quantity = ((Integer) product.get(3)).intValue();
+				double subtotal = price * quantity;
+
+				// Print each product's details in the order summary
+				out.println("<tr>");
+				out.println("<td>" + productId + "</td>");
+				out.println("<td>" + productName + "</td>");
+				out.println("<td>" + quantity + "</td>");
+				out.println("<td>" + NumberFormat.getCurrencyInstance().format(price) + "</td>");
+				out.println("<td>" + NumberFormat.getCurrencyInstance().format(subtotal) + "</td>");
+				out.println("</tr>");
+
+				// Accumulate the subtotal to the grand total
+				grandTotal += subtotal;
+			}
+		}
+
+		// Display the grand total
+		out.println("<tr><td colspan='4'><strong>Grand Total:</strong></td>");
+		out.println("<td><strong>" + NumberFormat.getCurrencyInstance().format(grandTotal) + "</strong></td></tr>");
+		out.println("</table>");
 
 		// Clear cart if order placed successfully
-		
+		out.println("<tr><td colspan='4'><strong>Grand Total:</strong></td>");
+		out.println("<td><strong>" + NumberFormat.getCurrencyInstance().format(grandTotal) + "</strong></td></tr>");
+		out.println("</table>");
+
+		// Step 5: Clear the cart if the order was placed successfully
+		if (orderId > 0) {
+			session.removeAttribute("productList");
+			out.println("<p>Thank you for your order! Your cart has been cleared.</p>");
+		} else {
+			out.println("<p>There was an issue placing your order. Please try again.</p>");
+		}
 	}
 
 	out.println("</table>"); // close ordersummary table
-
-catch (SQLException e1)
-{
-	System.err.println("SQLException: " + e1);
+}
+catch (SQLException e) {
+	e.printStackTrace();  // Add proper error handling
 }
 
 // Make connection
