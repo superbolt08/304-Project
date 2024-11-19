@@ -220,10 +220,12 @@ if (productList != null && !productList.isEmpty()) {
 
     // Clear the cart if the order was placed successfully
     session.removeAttribute("productList");
-    out.println("<p>Thank you for your order! Your cart has been cleared.</p>");
+    out.println("<h3>Thank you for your order! Will be shipped soon. Your cart has been cleared.</h3>");
 } else {
-    out.println("<p>Your cart is empty. Please add products before checkout.</p>");
+    out.println("<h3>Your cart is empty. Please add products before checkout.</h3>");
 }
+	out.println("<h3>Your reference number is " + orderId + " </h3>");
+	out.println("<h3>Shipping to customer: OrderId " + orderId + "   Name: " + firstName + " " + lastName + "</h3>");
 
 out.println("</table>"); // Close order summary table
 }
