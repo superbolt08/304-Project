@@ -38,10 +38,13 @@
                 <p>Price: <%= NumberFormat.getCurrencyInstance().format(price) %></p>
 
                 if (productImageURL != null && !productImageURL.isEmpty()) {
+                    //TODO: If there is a productImageURL, display using IMG tag
 %>
-                <img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
+<img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
 <%
 
+// Retrieve any image stored directly in database. Note: Call displayImage.jsp with product id as parameter.
+// Add links to Add to Cart and Continue Shopping
 %>
                 <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">
                 <a href="showcart.jsp" class="btn btn-primary">Add to Cart</a>
@@ -54,14 +57,7 @@
         }
     
         
-    }
-
-
-// TODO: If there is a productImageURL, display using IMG tag
-		
-// TODO: Retrieve any image stored directly in database. Note: Call displayImage.jsp with product id as parameter.
-		
-// TODO: Add links to Add to Cart and Continue Shopping
+    }		
 %>
 
 </body>
