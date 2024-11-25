@@ -1,3 +1,4 @@
+<!-- Find out how to log in as admin -->
 <%@ page session="true" %>
 <%@ page language="java" import="java.io.*, java.sql.*, java.text.NumberFormat" %>
 <%@ include file="auth.jsp" %>
