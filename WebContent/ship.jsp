@@ -19,13 +19,11 @@
 	// DONE: Get order id
     String orderId = request.getParameter("orderId");
 
-	// Make connection
-	String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-	String uid = "sa";
-	String pw = "304#sa#pw";
+	try {
+		// Open database connection
+    	getConnection();
 
-	// DONE: Check if valid order id in database
-	try (Connection con= DriverManager.getConnection(url, uid, pw);) {
+		// DONE: Check if valid order id in database
 		boolean orderIdExists = false;
 		String getOrderId = "SELECT orderId FROM OrderProduct WHERE orderId = ?";
 		try (PreparedStatement pstmt = con.PreparedStatement(getOrderId)) {
@@ -148,8 +146,12 @@
 		// DONE: Auto-commit should be turned back on
 		con.setAutoCommit(true);
 
-	} catch (SQLException e) {
-		System.err.println("SQLException while connecting to DB: " + e);
+		// close database connection
+		closeConnection(); 
+
+	} catch (Exception e) {
+		e.printStackTrace(); // Print error to JSP output for debugging
+		out.println("<p>Error</p>");
 	}
 %>                       				
 
