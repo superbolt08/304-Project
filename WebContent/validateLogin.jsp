@@ -35,18 +35,18 @@
 		{
 			// TODO (done): Check if userId and password match some customer account. If so, set retStr to be the username.
 			getConnection();
-
+			
             // SQL query to verify username and password
-            String sql = "SELECT username, role FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT userid, password FROM customer WHERE userid = ? AND password = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
-
+			
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                retStr = rs.getString("username");
-                String role = rs.getString("role");
+                retStr = username;
+                String role = rs.getString("password");
 
                 // Set session attributes based on role
                 session.removeAttribute("loginMessage");
@@ -71,13 +71,13 @@
 		{
 			closeConnection();
 		}	
-		
+		//retStr = "a";
 		if(retStr != null)
 		{	session.removeAttribute("loginMessage");
 			session.setAttribute("authenticatedUser",username);
 		}
 		else
-			session.setAttribute("loginMessage","Could not connect to the system using that username/password.");
+			session.setAttribute("loginMessage","Could not connect to the system using that username/password. ++");
 
 		return retStr;
 	}
