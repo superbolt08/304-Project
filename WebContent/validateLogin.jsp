@@ -32,10 +32,36 @@
 
 		try 
 		{
+			// TODO (done): Check if userId and password match some customer account. If so, set retStr to be the username.
 			getConnection();
-			
-			// TODO: Check if userId and password match some customer account. If so, set retStr to be the username.
-			retStr = "";			
+
+            // SQL query to verify username and password
+            String sql = "SELECT username, role FROM users WHERE username = ? AND password = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                retStr = rs.getString("username");
+                String role = rs.getString("role");
+
+                // Set session attributes based on role
+                session.removeAttribute("loginMessage");
+                session.setAttribute("authenticatedUser", username);
+                if ("admin".equalsIgnoreCase(role)) {
+                    session.setAttribute("adminId", username); // Set admin ID
+                } else {
+                    session.setAttribute("customerId", username); // Set customer ID
+                }
+            } else {
+                session.setAttribute("loginMessage", "Invalid username or password.");
+            }
+
+            rs.close();
+            stmt.close();
+
 		} 
 		catch (SQLException ex) {
 			out.println(ex);
