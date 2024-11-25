@@ -1,29 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Administrator Page</title>
-</head>
-<body>
-
-<%
-// TODO: Include files auth.jsp and jdbc.jsp (done)
-
+<%@ page session="true" %>
+<%@ page language="java" import="java.io.*, java.sql.*, java.text.NumberFormat" %>
 <%@ include file="auth.jsp" %>
+<%@ include file="jdbc.jsp" %>
+
 <%
+    // Ensure the user is logged in as an admin
     if (session.getAttribute("adminId") == null) {
         session.setAttribute("loginMessage", "You must log in as an admin to access this page.");
-        response.sendRedirect("login.jsp");
-        return;
+        try {
+            response.sendRedirect("login.jsp");
+        } catch (Exception e) {
+            out.println("Error while redirecting: " + e.getMessage());
+        }
+        return; // Stop further processing after redirect
     }
 %>
 
-<%@ include file="jdbc.jsp" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Administrator Page</title>
+</head>
+<body>
 
-%>
-<%
 
-// TODO: Write SQL query that prints out total order amount by day (done)
 
+<h3>Total Sales Report</h3>
 <%
     try {
         // Open database connection
@@ -40,7 +42,6 @@
 
         // Display the results
 %>
-        <h3>Total Sales Report</h3>
         <table border="1">
             <tr>
                 <th>Date</th>
@@ -57,23 +58,18 @@
             </tr>
 <%
         }
-%>
-        </table>
-<%
         rs.close();
         stmt.close();
         closeConnection();
     } catch (Exception e) {
-        e.printStackTrace();
+        e.printStackTrace(); // Print error to JSP output for debugging
 %>
         <p>Error retrieving sales report. Please try again later.</p>
 <%
     }
 %>
 
-
-%>
+</table>
 
 </body>
 </html>
-
