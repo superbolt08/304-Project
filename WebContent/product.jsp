@@ -17,7 +17,7 @@
 
 <a href="product.jsp?id=<%= product.getId() %>"><%= product.getName() %></a>
 
-// TODO: Retrieve and display info for the product
+// TODO (done): Retrieve and display info for the product
  String productId = request.getParameter("id");
  if (productId != null) {
         try {

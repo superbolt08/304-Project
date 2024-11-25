@@ -43,6 +43,8 @@ if (name != null && !name.trim().isEmpty()) {
     query += " WHERE productName LIKE ?";
 }
 
+// Set the query parameter to search for product names containing the input text
+
 try (Connection con = DriverManager.getConnection(url, uid, pw);
      PreparedStatement stmt = con.prepareStatement(query)) {
 
@@ -65,6 +67,9 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);
 		String productName = rst.getString("productName");
 		double productPrice = rst.getDouble("productPrice");
 
+		// CHANGES MADE HERE - [Added a link to open `product.jsp` with the specific product ID passed as a parameter]
+		String productLink = "product.jsp?id=" + productId; 
+
 		// Format the price
 		String formattedPrice = currFormat.format(productPrice);
 
@@ -72,7 +77,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);
 		
 		out.println("<tr>");
         out.println("<td>" + productId + "</td>");
-        out.println("<td><a href=\"" + link + "\">" + productName + "</a></td>");
+        out.println("<td><a href=\"" + productLink + "\">" + productName + "</a></td>");
         out.println("<td>" + formattedPrice + "</td>");
         out.println("</tr>");
 
