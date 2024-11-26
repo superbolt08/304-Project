@@ -22,7 +22,7 @@
     String productId = request.getParameter("id");
 
     // Debug: Check if productId is received
-    out.println("<p>Debug: Product ID = " + productId + "</p>");
+   // out.println("<p>Debug: Product ID = " + productId + "</p>");
 
     if (productId != null) {
         try (
@@ -32,10 +32,10 @@
             PreparedStatement stmt = con.prepareStatement("SELECT * FROM product WHERE productId = ?")
         ) {
             // Debug: Check if connection exists
-            if (con == null) {
-                out.println("<p>Error: No database connection found.</p>");
-                return;
-            }
+            // if (con == null) {
+            //     out.println("<p>Error: No database connection found.</p>");
+            //     return;
+            // }
 
             // Set the product ID in the query
             stmt.setInt(1, Integer.parseInt(productId));
@@ -48,7 +48,7 @@
                 String description = rs.getString("productDesc");
                 double price = rs.getDouble("productPrice");
                 String productImageURL = rs.getString("productImageURL");
-
+                out.println("<p>"+productImageURL+"</p>");
                 // Display product details
 %>
                 <div class="container">
@@ -56,10 +56,13 @@
                     <p><%= description %></p>
                     <p>Price: <%= NumberFormat.getCurrencyInstance().format(price) %></p>
 
+                    <!-- I dont know how to get the images to show -->
+
                     <!-- If there is a productImageURL, display using IMG tag -->
                     <% if (productImageURL != null && !productImageURL.isEmpty()) { %>
                         <img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
                     <% } %>
+                    <img src="img/1.jpg" style="max-width:300px;">
 
                     <!-- Display binary image -->
                     <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">

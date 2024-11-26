@@ -29,7 +29,7 @@
 <h4 align="center"><a href="ship.jsp?orderId=3">Test Ship orderId=3</a></h4>
 
 
-<%
+<%-- <%
     String currentUser = (String) session.getAttribute("username");
     if (currentUser != null) {
 %>
@@ -40,7 +40,7 @@
         <p>Welcome, Guest!</p>
 <%
     }
-%>
+%> --%>
 
 </body>
 </head>

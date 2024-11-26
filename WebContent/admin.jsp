@@ -28,17 +28,23 @@
 
 <h3>Total Sales Report</h3>
 <%
-    try {
-        // Open database connection
-        getConnection();
-
-        // SQL query to calculate total sales per day
-        String sql = "SELECT CAST(order_date AS DATE) AS SaleDate, SUM(total_amount) AS TotalSales " +
-                     "FROM orders " +
-                     "GROUP BY CAST(order_date AS DATE) " +
-                     "ORDER BY SaleDate";
-
-        PreparedStatement stmt = con.prepareStatement(sql);
+    // Database credentials
+    String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+    String uid = "sa";
+    String pw = "304#sa#pw";
+    
+    try (
+        // Establish database connection
+        Connection con = DriverManager.getConnection(url, uid, pw);
+        
+        // Prepare the SQL statement
+        PreparedStatement stmt = con.prepareStatement(
+            "SELECT CAST(orderDate AS DATE) AS SaleDate, SUM(totalAmount) AS TotalSales " +
+            "FROM orderSummary " +
+            "GROUP BY CAST(orderDate AS DATE) " +
+            "ORDER BY SaleDate"
+        )
+    ) {
         ResultSet rs = stmt.executeQuery();
 
         // Display the results

@@ -31,19 +31,26 @@
 		if((username.length() == 0) || (password.length() == 0))
 				return null;
 
-		try 
+		// Database credentials
+		String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+		String uid = "sa";
+		String pw = "304#sa#pw";
+		try (
+        // Establish database connection
+        Connection con = DriverManager.getConnection(url, uid, pw);
+        
+        // Prepare the SQL statement
+        PreparedStatement stmt = con.prepareStatement("SELECT userid, password FROM customer WHERE userid = ? AND password = ?"
+        )
+    ) 
 		{
-			// TODO (done): Check if userId and password match some customer account. If so, set retStr to be the username.
-			getConnection();
-			
             // SQL query to verify username and password
-            String sql = "SELECT userid, password FROM customer WHERE userid = ? AND password = ?";
-            PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
 			
             ResultSet rs = stmt.executeQuery();
 
+			// TODO (done): Check if userId and password match some customer account. If so, set retStr to be the username.
             if (rs.next()) {
                 retStr = username;
                 String role = rs.getString("password");
@@ -77,7 +84,7 @@
 			session.setAttribute("authenticatedUser",username);
 		}
 		else
-			session.setAttribute("loginMessage","Could not connect to the system using that username/password. ++");
+			session.setAttribute("loginMessage","Could not connect to the system using that username/password.");
 
 		return retStr;
 	}
