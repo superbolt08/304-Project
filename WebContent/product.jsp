@@ -29,7 +29,7 @@
             // Establish database connection
             Connection con = DriverManager.getConnection(url, uid, pw);
             // Prepare the SQL statement
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM products WHERE id = ?")
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM product WHERE productId = ?")
         ) {
             // Debug: Check if connection exists
             if (con == null) {
