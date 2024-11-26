@@ -37,7 +37,7 @@
 
         // get customer info from database
         String getCustomerInfo = "SELECT * FROM Customer WHERE customerId = ?";
-        try (PreparedStatement pstmt = con.PreparedStatement(getCustomerInfo)) {
+        try (PreparedStatement pstmt = con.prepareStatement(getCustomerInfo)) {
             pstmt.setInt(1, Integer.parseInt(cid));
             ResultSet rst = pstmt.executeQuery();
             if (rst.next()) {
