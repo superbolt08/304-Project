@@ -62,7 +62,6 @@
                     <% if (productImageURL != null && !productImageURL.isEmpty()) { %>
                         <img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
                     <% } %>
-                    <img src="img/1.jpg" style="max-width:300px;">
 
                     <!-- Display binary image -->
                     <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">
