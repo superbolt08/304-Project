@@ -16,11 +16,21 @@
     // TODO (done) Get product ID from request parameters
     String productId = request.getParameter("id");
 
+   // Debug: Check if productId is received
+    out.println("<p>Debug: Product ID = " + productId + "</p>");
+
     if (productId != null) {
         try {
+            // Get database connection
+            java.sql.Connection connection = (java.sql.Connection) application.getAttribute("connection");
+
+            // Debug: Check if connection exists
+            if (connection == null) {
+                out.println("<p>Error: No database connection found.</p>");
+                return;
+            }
             // Query to fetch product details
             String sql = "SELECT * FROM products WHERE id = ?";
-            java.sql.Connection connection = (java.sql.Connection) application.getAttribute("connection");
             java.sql.PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, Integer.parseInt(productId));
 
@@ -34,6 +44,7 @@
 
                 // Display product details
 %>
+                <div class="container">
                 <h2><%= name %></h2>
                 <p><%= description %></p>
                 <p>Price: <%= NumberFormat.getCurrencyInstance().format(price) %></p>
@@ -46,11 +57,24 @@
                 <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">
                 <a href="showcart.jsp" class="btn btn-primary">Add to Cart</a>
                 <a href="listprod.jsp" class="btn btn-secondary">Continue Shopping</a>
+                </div>
 <%
+            } else {
+                // Product not found
+                out.println("<p>Error: No product found for ID: " + productId + "</p>");
+            
             }
+        } catch (NumberFormatException e) {
+            out.println("<p>Error: Invalid product ID format.</p>");
+            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace(); // Handle exception
+            out.println("<p>Error occurred: " + e.getMessage() + "</p>");
+            e.printStackTrace();
         }
+    } else {
+        // No product ID provided
+        out.println("<p>Error: No product ID provided in the request.</p>");
+    
     }
 %>
 
