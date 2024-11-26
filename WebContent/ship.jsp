@@ -1,3 +1,4 @@
+<%@ page import="java.io.IOException" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.util.HashMap" %>
@@ -19,6 +20,11 @@
 	// DONE: Get order id
     String orderId = request.getParameter("orderId");
 
+    if (orderId == null || !orderId.matches("\\d+")) {
+        out.println("<p>Invalid Order ID. Please try again.</p>");
+        return;
+    }
+
 	try {
 		// Open database connection
     	getConnection();
@@ -26,7 +32,7 @@
 		// DONE: Check if valid order id in database
 		boolean orderIdExists = false;
 		String getOrderId = "SELECT orderId FROM OrderProduct WHERE orderId = ?";
-		try (PreparedStatement pstmt = con.PreparedStatement(getOrderId)) {
+		try (PreparedStatement pstmt = con.prepareStatement(getOrderId)) {
 			pstmt.setInt(1, Integer.parseInt(orderId));
 			ResultSet rst = pstmt.executeQuery();
 			if (rst.next()) {
@@ -38,7 +44,7 @@
 
 		// if orderId not exist, display an error message
 		if (!orderIdExists) {
-			out.println("<p>Order ID doesnt exist. Please try again.</p>");
+			out.println("<p>Order ID doesn't exist. Please try again.</p>");
 			return;
 		}
 	
@@ -46,10 +52,10 @@
 		con.setAutoCommit(false);
 		
 		// DONE: Retrieve all items in order with given id
-		ArrayList<Integer> itemList = new ArrayList<Integer>();	// arraylist to store all retrived items
+		ArrayList<Integer[]> itemList = new ArrayList<>();	// arraylist to store all retrieved items
 
 		String getItems = "SELECT * FROM OrderProduct WHERE orderId = ?";
-		try (PreparedStatement pstmt = con.PreparedStatement(getItems)) {
+		try (PreparedStatement pstmt = con.prepareStatement(getItems)) {
 			pstmt.setInt(1, Integer.parseInt(orderId));
 			ResultSet rst = pstmt.executeQuery();
 
@@ -58,9 +64,8 @@
 				int quantity = rst.getInt("quantity");
 				int price = rst.getInt("price");
 
-				itemList.add({productId, quantity, price});
+				itemList.add(new Integer[] {productId, quantity, price});
 			}
-			
 		} catch (SQLException e) {
 			System.err.println("SQLException while retrieving items using this order ID: " + e);
 		}
@@ -74,22 +79,23 @@
 			int pid = itemList.get(i)[0];
 			int qty = itemList.get(i)[1];
 
-			String newShipment = "INSERT INTO Shipment (shipmentId, shipmentDate, shipmentDesc, warehouseId)"
-						+ " VALUES(?, ?, ?, ?)";
-			try (PreparedStatement pstmt = con.PreparedStatement(newShipment)) {
-				pstmt.setInt(1, orderId);
-				pstmt.setDate(2, new java.sql.Date(orderDate.getTime()));
+			// Prepare Shipment record for each item
+			String newShipment = "INSERT INTO Shipment (shipmentId, shipmentDate, shipmentDesc, warehouseId) "
+						+ "VALUES(?, ?, ?, ?)";
+			try (PreparedStatement pstmt = con.prepareStatement(newShipment)) {
+				pstmt.setInt(1, Integer.parseInt(orderId));
+				pstmt.setDate(2, new java.sql.Date(new Date().getTime()));
 				pstmt.setString(3, "Product: "+pid+", Qty: "+qty);
 				pstmt.setInt(4, warehouseId);
 
 				pstmt.executeUpdate(); // insert into Shipment transaction pending
 			} catch (SQLException e) {
-				System.err.println("SQLException while insert into Shipment: " + e);
+				System.err.println("SQLException while inserting into Shipment: " + e);
 			}
 
 			// DONE: For each item verify sufficient quantity available in warehouse 1.
 			String checkProductQty = "SELECT quantity FROM ProductInventory WHERE productId = ? AND warehouseId = ?";
-			try (PreparedStatement pstmt = con.PreparedStatement(checkProductQty)) {
+			try (PreparedStatement pstmt = con.prepareStatement(checkProductQty)) {
 				pstmt.setInt(1, pid);
 				pstmt.setInt(2, warehouseId);
 
@@ -97,7 +103,7 @@
 
 				if (rst.next()) {
 					// DONE: If any item does not have sufficient inventory, cancel transaction and rollback. 
-					//       Otherwise, update inventory for each item.
+					// Otherwise, update inventory for each item.
 					int productQty = rst.getInt("quantity");
 
 					if (productQty < qty) { // insufficient inventory, so rollback insert into Shipment transaction
@@ -105,53 +111,54 @@
 						failedShipmentProductIds.add(pid); 
 					}
 					else {	
-						con.commit();	// sufficient inventory, so commit insert into Shipment transaction
-
-						// update product inventory
+						// Update inventory
 						int newProductQty = productQty - qty;
 						String updateInventory = "UPDATE ProductInventory SET quantity = ? WHERE productId = ? AND warehouseId = ?";
-						try (PreparedStatement pstmt2 = con.PreparedStatement(checkProductQty)) {
+						try (PreparedStatement pstmt2 = con.prepareStatement(updateInventory)) {
 							pstmt2.setInt(1, newProductQty);
 							pstmt2.setInt(2, pid);
 							pstmt2.setInt(3, warehouseId);
 							pstmt2.executeUpdate();
-
-							con.commit();	// commit the update to product inventory
 
 							out.println("<p>Ordered product: "+pid+" Qty: "+qty+" Previous inventory: "+productQty+" New Inventory: "+newProductQty+"</p>");
 						} catch (SQLException e) {
 							System.err.println("SQLException while updating ProductInventory: " + e);
 						}
 					}
-				}
-				else {
-					System.out.println("product Id and/or warehouse Id does not exist");
+				} else {
+					out.println("<p>Product ID " + pid + " not found in the warehouse.</p>");
 				}
 			} catch (SQLException e) {
 				System.err.println("SQLException while verifying inventory of product: " + e);
 			}
-			
 		}
 
-		// print success or fail message regarding the shipment processing
-		if (failedShipmentProductIds.size() == 0) {
+		// Commit if all items are successfully processed
+		// Rollback and display failure messages for each product
+		if (failedShipmentProductIds.size() > 0) {
+			con.rollback();
+			for (Integer n : failedShipmentProductIds) {
+				try {
+					out.println("<h2>Shipment not done. Insufficient inventory for product id: " + n + "</h2>");
+				} catch (IOException e) {
+					e.printStackTrace(); // Handle IOException
+				}
+			}
+		} else {
+			con.commit();
 			out.println("<h2>Shipment successfully processed.</h2>");
 		}
-		else {
-			failedShipmentProductIds.forEach (
-				(n) -> out.println("<h2>Shipment not done. Insufficient inventory for product id: "+n+"</h2>");
-			);
-		}
-			
+
+
 		// DONE: Auto-commit should be turned back on
 		con.setAutoCommit(true);
 
-		// close database connection
+		// Close database connection
 		closeConnection(); 
 
 	} catch (Exception e) {
 		e.printStackTrace(); // Print error to JSP output for debugging
-		out.println("<p>Error</p>");
+		out.println("<p>Error processing the shipment. Please try again later.</p>");
 	}
 %>                       				
 

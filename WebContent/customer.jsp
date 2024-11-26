@@ -53,19 +53,20 @@
                 String userid = rst.getString("userid");
 
                 // print customer info
-                out.println("<table>
-                                <tr><th>Id</th><td>"+cid+"</td></tr>
-                                <tr><th>First Name</th><td>"+firstName+"</td></tr>
-                                <tr><th>Last Name</th><td>"+lastName+"</td></tr>
-                                <tr><th>Email</th><td>"+email+"</td></tr>
-                                <tr><th>Phone</th><td>"+phonenum+"</td></tr>
-                                <tr><th>Address</th><td>"+address+"</td></tr>
-                                <tr><th>City</th><td>"+city+"</td></tr>
-                                <tr><th>State</th><td>"+state+"</td></tr>
-                                <tr><th>Postal Code</th><td>"+postalCode+"</td></tr>
-                                <tr><th>Country</th><td>"+country+"</td></tr>
-                                <tr><th>User Id</th><td>"+userid+"</td></tr>
-                            </table>");
+                out.println("<table>" +
+                    "<tr><th>Id</th><td>" + cid + "</td></tr>" +
+                    "<tr><th>First Name</th><td>" + firstName + "</td></tr>" +
+                    "<tr><th>Last Name</th><td>" + lastName + "</td></tr>" +
+                    "<tr><th>Email</th><td>" + email + "</td></tr>" +
+                    "<tr><th>Phone</th><td>" + phonenum + "</td></tr>" +
+                    "<tr><th>Address</th><td>" + address + "</td></tr>" +
+                    "<tr><th>City</th><td>" + city + "</td></tr>" +
+                    "<tr><th>State</th><td>" + state + "</td></tr>" +
+                    "<tr><th>Postal Code</th><td>" + postalCode + "</td></tr>" +
+                    "<tr><th>Country</th><td>" + country + "</td></tr>" +
+                    "<tr><th>User Id</th><td>" + userid + "</td></tr>" +
+                "</table>");
+
             }
             else {
                 out.println("<p>Error: Could not find any info</p>");
