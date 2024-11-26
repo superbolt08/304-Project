@@ -13,28 +13,35 @@
 <%@ include file="header.jsp" %>
 
 <%
-    // TODO (done) Get product ID from request parameters
+    // Database credentials
+    String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+    String uid = "sa";
+    String pw = "304#sa#pw";
+
+    // Get product ID from request parameters
     String productId = request.getParameter("id");
 
-   // Debug: Check if productId is received
+    // Debug: Check if productId is received
     out.println("<p>Debug: Product ID = " + productId + "</p>");
 
     if (productId != null) {
-        try {
-            // Get database connection
-            java.sql.Connection connection = (java.sql.Connection) application.getAttribute("connection");
-
+        try (
+            // Establish database connection
+            Connection con = DriverManager.getConnection(url, uid, pw);
+            // Prepare the SQL statement
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM products WHERE id = ?")
+        ) {
             // Debug: Check if connection exists
-            if (connection == null) {
+            if (con == null) {
                 out.println("<p>Error: No database connection found.</p>");
                 return;
             }
-            // Query to fetch product details
-            String sql = "SELECT * FROM products WHERE id = ?";
-            java.sql.PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, Integer.parseInt(productId));
 
-            java.sql.ResultSet rs = preparedStatement.executeQuery();
+            // Set the product ID in the query
+            stmt.setInt(1, Integer.parseInt(productId));
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 String name = rs.getString("productName");
@@ -45,24 +52,26 @@
                 // Display product details
 %>
                 <div class="container">
-                <h2><%= name %></h2>
-                <p><%= description %></p>
-                <p>Price: <%= NumberFormat.getCurrencyInstance().format(price) %></p>
+                    <h2><%= name %></h2>
+                    <p><%= description %></p>
+                    <p>Price: <%= NumberFormat.getCurrencyInstance().format(price) %></p>
 
-                //TODO(done): If there is a productImageURL, display using IMG tag
-                <% if (productImageURL != null && !productImageURL.isEmpty()) { %>
-                    <img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
-                <% } %>
+                    <!-- If there is a productImageURL, display using IMG tag -->
+                    <% if (productImageURL != null && !productImageURL.isEmpty()) { %>
+                        <img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
+                    <% } %>
 
-                <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">
-                <a href="showcart.jsp" class="btn btn-primary">Add to Cart</a>
-                <a href="listprod.jsp" class="btn btn-secondary">Continue Shopping</a>
+                    <!-- Display binary image -->
+                    <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">
+
+                    <!-- Links to add to cart and continue shopping -->
+                    <a href="showcart.jsp" class="btn btn-primary">Add to Cart</a>
+                    <a href="listprod.jsp" class="btn btn-secondary">Continue Shopping</a>
                 </div>
 <%
             } else {
                 // Product not found
                 out.println("<p>Error: No product found for ID: " + productId + "</p>");
-            
             }
         } catch (NumberFormatException e) {
             out.println("<p>Error: Invalid product ID format.</p>");
@@ -74,7 +83,6 @@
     } else {
         // No product ID provided
         out.println("<p>Error: No product ID provided in the request.</p>");
-    
     }
 %>
 
