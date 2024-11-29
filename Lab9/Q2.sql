@@ -4,13 +4,25 @@ SELECT dept.dno, dept.dname, COUNT(*) as totalEmp, SUM(salary) as totalSalary
 FROM dept JOIN emp ON dept.dno = emp.dno
 GROUP BY dept.dno
 
--- Q2.2 (todo)
--- Write a CREATE VIEW statement for workson database called empSummary
---  that has the employee number, name, salary, birthdate, department, count of 
---  projects worked on for the employee and the total hours worked. 
---  Only show employees in 'D1', 'D2', or 'D3' and with birthdate after '1966-06-08'.
---  View contents:
+-- Q2.2
+
 CREATE VIEW empSummary AS 
-SELECT e.eno, e.ename, e.salary, e.bdate, e.dno 
-FROM emp as e
-JOIN workson ON 
+SELECT 
+    e.eno, 
+    e.ename, 
+    e.salary, 
+    e.bdate, 
+    e.dno, 
+    COUNT(w.pno) AS totalProj,  -- Count the distinct projects worked on
+    SUM(w.hours) AS totalHours -- Sum the total hours worked
+FROM 
+    emp AS e
+LEFT JOIN 
+    workson AS w 
+ON 
+    e.eno = w.eno
+WHERE 
+    (e.dno = 'D1' OR e.dno = 'D2' OR e.dno = 'D3') -- Filter departments
+    AND e.bdate > '1966-06-08'                     -- Filter birthdates
+GROUP BY 
+    e.eno, e.ename, e.salary, e.bdate, e.dno;
