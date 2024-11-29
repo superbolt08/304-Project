@@ -1,0 +1,24 @@
+{
+    "dept": {
+        "D1": {
+            "dname": "Maths",
+            "mgreno": "M6"
+        },
+        "D2": {
+            "dname": "Physics",
+            "mgreno": "M3"
+        }
+    },
+    "proj": {
+        "P3": {
+            "pname": "Project Shadow",
+            "budget": 50000000,
+            "dno": "D2"
+        },
+        "P5": {
+            "pname": "Olympics",
+            "budget": 50,
+            "dno": "D9"
+        }
+    }
+}
