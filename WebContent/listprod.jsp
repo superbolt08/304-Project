@@ -1,10 +1,12 @@
 <%@ page import="java.sql.*,java.net.URLEncoder" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
+<%@ include file="header.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Baby Goat Sweaters Shop</title>
+	<title>Baby Goat Sweaters Shop</title>
+	<link rel="stylesheet" type="text/css" href="./styles/styles.css">
 </head>
 <body>
 

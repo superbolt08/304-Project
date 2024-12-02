@@ -4,12 +4,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>YOUR NAME Grocery Order List</title>
-<style>
-	table, th, td {
-  		border:1px solid black;
-	}
-</style>
+<title>Baby Goat Sweater's Order List</title>
+	<style>
+		table, th, td {
+			border:1px solid black;
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="./styles/styles.css">
 </head>
 <body>
 
