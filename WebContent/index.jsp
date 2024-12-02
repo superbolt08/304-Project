@@ -2,9 +2,10 @@
 <html>
 <head>
         <title>Baby Goat Sweater's Grocery Main Page</title>
+        <link rel="stylesheet" type="text/css" href="./styles/styles.css">
 </head>
 <body>
-<h1 align="center">Welcome to Baby Goat Sweater's Grocery</h1>
+<%@ include file="header.jsp"%>
 
 <h2 align="center"><a href="login.jsp">Login</a></h2>
 

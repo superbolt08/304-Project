@@ -1,0 +1,91 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    background-color: #e3f2fd; /* Light blue */
+    font-family: 'Nunito', 'Arial', sans-serif; /* Minimalist font */
+    color: #333; /* Dark gray for text */
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Header Styling */
+header {
+    background-color: #bbdefb; /* Slightly darker blue */
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Content Styling */
+h1, h2, h3 {
+    font-weight: 600; /* Semi-bold */
+    margin-bottom: 15px;
+}
+
+p {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+/* Button Styling */
+button {
+    background-color: #64b5f6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #42a5f5;
+}
+
+/* Links */
+a {
+    color: #0288d1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Card Component */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 0.95em;
+    color: #555;
+}
