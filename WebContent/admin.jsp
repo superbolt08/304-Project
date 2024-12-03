@@ -1,82 +1,52 @@
-<!-- Find out how to log in as admin -->
-<%@ page session="true" %>
-<%@ page language="java" import="java.io.*, java.sql.*, java.text.NumberFormat" %>
-<%@ include file="auth.jsp" %>
-<%@ include file="jdbc.jsp" %>
-
-<%
-    // Ensure the user is logged in as an admin
-    if (session.getAttribute("adminId") == null) {
-        session.setAttribute("loginMessage", "You must log in as an admin to access this page.");
-        try {
-            response.sendRedirect("login.jsp");
-        } catch (Exception e) {
-            out.println("Error while redirecting: " + e.getMessage());
-        }
-        return; // Stop further processing after redirect
-    }
-%>
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Administrator Page</title>
+<title>Administrator Page</title>
 </head>
 <body>
 
+<%@ include file="auth.jsp"%>
+<%@ page import="java.text.NumberFormat" %>
+<%@ include file="jdbc.jsp" %>
 
-
-<h3>Total Sales Report</h3>
 <%
-    // Database credentials
-    String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-    String uid = "sa";
-    String pw = "304#sa#pw";
-    
-    try (
-        // Establish database connection
-        Connection con = DriverManager.getConnection(url, uid, pw);
-        
-        // Prepare the SQL statement
-        PreparedStatement stmt = con.prepareStatement(
-            "SELECT CAST(orderDate AS DATE) AS SaleDate, SUM(totalAmount) AS TotalSales " +
-            "FROM orderSummary " +
-            "GROUP BY CAST(orderDate AS DATE) " +
-            "ORDER BY SaleDate"
-        )
-    ) {
-        ResultSet rs = stmt.executeQuery();
-
-        // Display the results
-%>
-        <table border="1">
-            <tr>
-                <th>Date</th>
-                <th>Total Sales</th>
-            </tr>
-<%
-        while (rs.next()) {
-            String date = rs.getString("SaleDate");
-            double totalSales = rs.getDouble("TotalSales");
-%>
-            <tr>
-                <td><%= date %></td>
-                <td><%= NumberFormat.getCurrencyInstance().format(totalSales) %></td>
-            </tr>
-<%
-        }
-        rs.close();
-        stmt.close();
-        closeConnection();
-    } catch (Exception e) {
-        e.printStackTrace(); // Print error to JSP output for debugging
-%>
-        <p>Error retrieving sales report. Please try again later.</p>
-<%
-    }
+	String userName = (String) session.getAttribute("authenticatedUser");
 %>
 
-</table>
+<%
+
+// Print out total order amount by day
+String sql = "select year(orderDate), month(orderDate), day(orderDate), SUM(totalAmount) FROM OrderSummary GROUP BY year(orderDate), month(orderDate), day(orderDate)";
+
+NumberFormat currFormat = NumberFormat.getCurrencyInstance();
+
+try 
+{	
+	out.println("<h3>Administrator Sales Report by Day</h3>");
+	
+	getConnection();
+	Statement stmt = con.createStatement(); 
+	stmt.execute("USE orders");
+
+	ResultSet rst = con.createStatement().executeQuery(sql);		
+	out.println("<table class=\"table\" border=\"1\">");
+	out.println("<tr><th>Order Date</th><th>Total Order Amount</th>");	
+
+	while (rst.next())
+	{
+		out.println("<tr><td>"+rst.getString(1)+"-"+rst.getString(2)+"-"+rst.getString(3)+"</td><td>"+currFormat.format(rst.getDouble(4))+"</td></tr>");
+	}
+	out.println("</table>");		
+}
+catch (SQLException ex) 
+{ 	out.println(ex); 
+}
+finally
+{	
+	closeConnection();	
+}
+%>
 
 </body>
 </html>
+

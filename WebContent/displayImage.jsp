@@ -23,6 +23,9 @@ String sql = "SELECT productImage FROM Product P  WHERE productId = ?";
 try 
 {
 	getConnection();
+	Statement st = con.createStatement(); 			
+	st.execute("USE orders");
+	st.close();
 
 	PreparedStatement stmt = con.prepareStatement(sql);
 	stmt.setInt(1,idVal);
@@ -41,7 +44,7 @@ try
 		while ( (count = istream.read(data, 0, BUFFER_SIZE)) != -1)
 			ostream.write(data, 0, count);
 
-		ostream.close();
+		ostream.flush();
 		istream.close();					
 	}
 } 

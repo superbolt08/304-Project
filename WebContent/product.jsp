@@ -5,88 +5,72 @@
 
 <html>
 <head>
-    <title>Baby Goat Sweater's Grocery - Product Information</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+<title>Ray's Grocery - Product Information</title>
+<link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
 <%@ include file="header.jsp" %>
 
 <%
-    // Database credentials
-    String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-    String uid = "sa";
-    String pw = "304#sa#pw";
+// Get product name to search for
+String productId = request.getParameter("id");
 
-    // Get product ID from request parameters
-    String productId = request.getParameter("id");
+String sql = "SELECT productId, productName, productPrice, productImageURL, productImage FROM Product P  WHERE productId = ?";
 
-    // Debug: Check if productId is received
-   // out.println("<p>Debug: Product ID = " + productId + "</p>");
+NumberFormat currFormat = NumberFormat.getCurrencyInstance();
 
-    if (productId != null) {
-        try (
-            // Establish database connection
-            Connection con = DriverManager.getConnection(url, uid, pw);
-            // Prepare the SQL statement
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM product WHERE productId = ?")
-        ) {
-            // Debug: Check if connection exists
-            // if (con == null) {
-            //     out.println("<p>Error: No database connection found.</p>");
-            //     return;
-            // }
+try 
+{
+	getConnection();
+	Statement stmt = con.createStatement(); 			
+	stmt.execute("USE orders");
+	
+	PreparedStatement pstmt = con.prepareStatement(sql);
+	pstmt.setInt(1, Integer.parseInt(productId));			
+	
+	ResultSet rst = pstmt.executeQuery();
+			
+	if (!rst.next())
+	{
+		out.println("Invalid product");
+	}
+	else
+	{		
+		out.println("<h2>"+rst.getString(2)+"</h2>");
+		
+		int prodId = rst.getInt(1);
+		out.println("<table><tr>");
+		out.println("<th>Id</th><td>" + prodId + "</td></tr>"				
+				+ "<tr><th>Price</th><td>" + currFormat.format(rst.getDouble(3)) + "</td></tr>");
+		
+		//  Retrieve any image with a URL
+		String imageLoc = rst.getString(4);
+		if (imageLoc != null)
+			out.println("<img src=\""+imageLoc+"\">");
+		
+		// Retrieve any image stored directly in database
+		String imageBinary = rst.getString(5);
+		if (imageBinary != null)
+			out.println("<img src=\"displayImage.jsp?id="+prodId+"\">");	
+		out.println("</table>");
+		
 
-            // Set the product ID in the query
-            stmt.setInt(1, Integer.parseInt(productId));
-
-            // Execute the query
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String name = rs.getString("productName");
-                String description = rs.getString("productDesc");
-                double price = rs.getDouble("productPrice");
-                String productImageURL = rs.getString("productImageURL");
-                out.println("<p>"+productImageURL+"</p>");
-                // Display product details
-%>
-                <div class="container">
-                    <h2><%= name %></h2>
-                    <p><%= description %></p>
-                    <p>Price: <%= NumberFormat.getCurrencyInstance().format(price) %></p>
-
-                    <!-- I dont know how to get the images to show -->
-
-                    <!-- If there is a productImageURL, display using IMG tag -->
-                    <% if (productImageURL != null && !productImageURL.isEmpty()) { %>
-                        <img src="<%= productImageURL %>" alt="<%= name %>" style="max-width:300px;">
-                    <% } %>
-
-                    <!-- Display binary image -->
-                    <img src="displayImage.jsp?id=<%= productId %>" alt="Product Image" style="max-width:300px;">
-
-                    <!-- Links to add to cart and continue shopping -->
-                    <a href="showcart.jsp" class="btn btn-primary">Add to Cart</a>
-                    <a href="listprod.jsp" class="btn btn-secondary">Continue Shopping</a>
-                </div>
-<%
-            } else {
-                // Product not found
-                out.println("<p>Error: No product found for ID: " + productId + "</p>");
-            }
-        } catch (NumberFormatException e) {
-            out.println("<p>Error: Invalid product ID format.</p>");
-            e.printStackTrace();
-        } catch (Exception e) {
-            out.println("<p>Error occurred: " + e.getMessage() + "</p>");
-            e.printStackTrace();
-        }
-    } else {
-        // No product ID provided
-        out.println("<p>Error: No product ID provided in the request.</p>");
-    }
+		out.println("<h3><a href=\"addcart.jsp?id="+prodId+ "&name=" + rst.getString(2)
+								+ "&price=" + rst.getDouble(3)+"\">Add to Cart</a></h3>");		
+		
+		out.println("<h3><a href=\"listprod.jsp\">Continue Shopping</a>");
+	}
+} 
+catch (SQLException ex) {
+	out.println(ex);
+}
+finally
+{
+	closeConnection();
+}
 %>
 
 </body>
 </html>
+

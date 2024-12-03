@@ -1,4 +1,3 @@
-<!-- COMPLETED -->
 <%@ page language="java" import="java.io.*,java.sql.*"%>
 <%@ include file="jdbc.jsp" %>
 <%
@@ -31,45 +30,21 @@
 		if((username.length() == 0) || (password.length() == 0))
 				return null;
 
-		// Database credentials
-		String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-		String uid = "sa";
-		String pw = "304#sa#pw";
-		try (
-        // Establish database connection
-        Connection con = DriverManager.getConnection(url, uid, pw);
-        
-        // Prepare the SQL statement
-        PreparedStatement stmt = con.prepareStatement("SELECT userid, password FROM customer WHERE userid = ? AND password = ?"
-        )
-    ) 
+		try 
 		{
-            // SQL query to verify username and password
-            stmt.setString(1, username);
-            stmt.setString(2, password);
+			getConnection();
+			Statement stmt = con.createStatement(); 
+			stmt.execute("USE orders");
+
+			String sql = "SELECT * FROM Customer WHERE userId = ? and password = ?";
+			PreparedStatement pstmt = con.prepareStatement(sql);			
+			pstmt.setString(1, username);
+			pstmt.setString(2, password);
 			
-            ResultSet rs = stmt.executeQuery();
-
-			// TODO (done): Check if userId and password match some customer account. If so, set retStr to be the username.
-            if (rs.next()) {
-                retStr = username;
-                String role = rs.getString("password");
-
-                // Set session attributes based on role
-                session.removeAttribute("loginMessage");
-                session.setAttribute("authenticatedUser", username);
-                if ("admin".equalsIgnoreCase(role)) {
-                    session.setAttribute("adminId", username); // Set admin ID
-                } else {
-                    session.setAttribute("customerId", username); // Set customer ID
-                }
-            } else {
-                session.setAttribute("loginMessage", "Invalid username or password.");
-            }
-
-            rs.close();
-            stmt.close();
-
+			ResultSet rst = pstmt.executeQuery();
+					
+			if (rst.next())
+				retStr = username; // Login successful			
 		} 
 		catch (SQLException ex) {
 			out.println(ex);
@@ -78,7 +53,7 @@
 		{
 			closeConnection();
 		}	
-		//retStr = "a";
+		
 		if(retStr != null)
 		{	session.removeAttribute("loginMessage");
 			session.setAttribute("authenticatedUser",username);
