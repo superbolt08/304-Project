@@ -2,6 +2,7 @@
 <%@ page import="java.text.NumberFormat" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
 <%@ include file="header.jsp" %>
+<%@ include file="jdbc.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,23 +21,12 @@
 <% // Get product name to search for
 String name = request.getParameter("productName");
 		
-//Note: Forces loading of SQL Server driver
-try
-{	// Load driver class
-	Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-}
-catch (java.lang.ClassNotFoundException e)
-{
-	out.println("ClassNotFoundException: " +e);
-}
 
 
 // Question starts here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // connection details
-String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-String uid = "sa";
-String pw = "304#sa#pw";
+
 
 	
 //prepare connect
@@ -46,10 +36,10 @@ if (name != null && !name.trim().isEmpty()) {
 }
 
 // Set the query parameter to search for product names containing the input text
-
-try (Connection con = DriverManager.getConnection(url, uid, pw);
-     PreparedStatement stmt = con.prepareStatement(query)) {
-
+try {
+	getConnection();
+	PreparedStatement stmt = con.prepareStatement(query);
+	
     if (name != null && !name.trim().isEmpty()) {
         stmt.setString(1, "%" + name + "%");
     }
@@ -85,8 +75,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);
 
 	}
 	out.println("</table>");
-} 
-
+}
 catch (SQLException ex) {
 	System.err.println("SQLException: " + ex);
 }
