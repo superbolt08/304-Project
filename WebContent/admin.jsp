@@ -88,7 +88,7 @@ finally
 // Insert product into database
 String insertSQL = "INSERT INTO product (productName, categoryId, productDesc, productPrice) VALUES (?, ?, ?, ?)";
     // Check if the form has been submitted
-    if (request.getParameter("submit") != null) {
+    if (request.getParameter("add-submit") != null) {
         String productName = request.getParameter("productName");
         String categoryId = request.getParameter("categoryId");
         String productDesc = request.getParameter("productDesc");
@@ -121,7 +121,7 @@ String insertSQL = "INSERT INTO product (productName, categoryId, productDesc, p
 	}
 %>
 
-<form method="post">
+<form method="post" name = "add-submit">
     <h3>Enter New Product</h3>
     <table>
         <tr>
@@ -141,7 +141,7 @@ String insertSQL = "INSERT INTO product (productName, categoryId, productDesc, p
             <td><input type="number" step="0.01" name="productPrice" required></td>
         </tr>
     </table>
-    <input type="submit" name="submit" value="Add Product">
+    <input type="submit" name="add-submit" value="Add Product">
 </form>
 
 </body>
