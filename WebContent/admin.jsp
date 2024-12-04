@@ -119,6 +119,44 @@ String insertSQL = "INSERT INTO product (productName, categoryId, productDesc, p
             closeConnection();
         }
 	}
+
+// Update product into database
+String updateSQL = "UPDATE product SET productName = ?, categoryId = ?, productDesc = ?, productPrice = ? WHERE productName = ?";
+    // Check if the form has been submitted
+    if (request.getParameter("update-submit") != null) {
+        String productName = request.getParameter("productName");
+        String categoryId = request.getParameter("categoryId");
+        String productDesc = request.getParameter("productDesc");
+        String productPrice = request.getParameter("productPrice");
+		String existingProductName = request.getParameter("existingProductName"); // Old product name
+
+		 try {
+            // Establish database connection
+            getConnection();
+			Statement stmt = con.createStatement();
+			stmt.execute("USE orders"); // select the database
+
+            PreparedStatement pstmt = con.prepareStatement(updateSQL);
+			
+
+            // Set parameters
+            pstmt.setString(1, productName);
+            pstmt.setInt(2, Integer.parseInt(categoryId));
+            pstmt.setString(3, productDesc);
+            pstmt.setDouble(4, Double.parseDouble(productPrice));
+      		pstmt.setString(5, existingProductName); // WHERE clause
+
+            // Execute the insert query
+            int rowsInserted = pstmt.executeUpdate();
+            if (rowsInserted > 0) {
+                out.println("<p>Product updated successfully!</p>");
+            }
+        } catch (SQLException ex) {
+            out.println("<p>Error updating product: " + ex.getMessage() + "</p>");
+        } finally {
+            closeConnection();
+        }
+	}
 %>
 
 <form method="post" name = "add-submit">
@@ -142,6 +180,33 @@ String insertSQL = "INSERT INTO product (productName, categoryId, productDesc, p
         </tr>
     </table>
     <input type="submit" name="add-submit" value="Add Product">
+</form>
+
+<form method="post" name = "update-submit">
+    <h3>Update Product</h3>
+    <table>
+		<tr>
+            <td>Existing Product Name:</td>
+            <td><input type="text" name="existingProductName" required></td>
+        </tr>
+        <tr>
+            <td>Product Name:</td>
+            <td><input type="text" name="productName" required></td>
+        </tr>
+        <tr>
+            <td>Category ID:</td>
+            <td><input type="number" name="categoryId" required></td>
+        </tr>
+        <tr>
+            <td>Product Description:</td>
+            <td><textarea name="productDesc" required></textarea></td>
+        </tr>
+        <tr>
+            <td>Product Price:</td>
+            <td><input type="number" step="0.01" name="productPrice" required></td>
+        </tr>
+    </table>
+    <input type="submit" name="update-submit" value="Update Product">
 </form>
 
 </body>
