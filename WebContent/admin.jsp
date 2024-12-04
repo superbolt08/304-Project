@@ -157,8 +157,36 @@ String updateSQL = "UPDATE product SET productName = ?, categoryId = ?, productD
             closeConnection();
         }
 	}
-%>
 
+// DELETE product from database
+String deleteSQL = "DELETE product WHERE productName = ?";
+    // Check if the form has been submitted
+    if (request.getParameter("delete-submit") != null) {
+		String existingProductName = request.getParameter("existingProductName"); // Old product name
+
+		 try {
+            // Establish database connection
+            getConnection();
+			Statement stmt = con.createStatement();
+			stmt.execute("USE orders"); // select the database
+
+            PreparedStatement pstmt = con.prepareStatement(deleteSQL);
+			
+      		pstmt.setString(1, existingProductName); // WHERE clause
+
+            // Execute the insert query
+            int rowsInserted = pstmt.executeUpdate();
+            if (rowsInserted > 0) {
+                out.println("<p>Product deleted successfully!</p>");
+            }
+        } catch (SQLException ex) {
+            out.println("<p>Error deleting product: " + ex.getMessage() + "</p>");
+        } finally {
+            closeConnection();
+        }
+	}
+%>
+<!-- Add Product -->
 <form method="post" name = "add-submit">
     <h3>Enter New Product</h3>
     <table>
@@ -181,7 +209,7 @@ String updateSQL = "UPDATE product SET productName = ?, categoryId = ?, productD
     </table>
     <input type="submit" name="add-submit" value="Add Product">
 </form>
-
+<!-- Update Product -->
 <form method="post" name = "update-submit">
     <h3>Update Product</h3>
     <table>
@@ -208,7 +236,7 @@ String updateSQL = "UPDATE product SET productName = ?, categoryId = ?, productD
     </table>
     <input type="submit" name="update-submit" value="Update Product">
 </form>
-
+<!-- Delete product -->
 <form method="post" name = "delete-submit">
     <h3>Delete Product</h3>
     <table>
