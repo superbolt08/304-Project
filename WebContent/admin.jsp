@@ -126,29 +126,6 @@ String insertSQL = "INSERT INTO product (productName, categoryId, productDesc, p
     <table>
         <tr>
             <td>Product Name:</td>
-            <td><input type="text" name="add-productName" required></td>
-        </tr>
-        <tr>
-            <td>Category ID:</td>
-            <td><input type="number" name="add-categoryId" required></td>
-        </tr>
-        <tr>
-            <td>Product Description:</td>
-            <td><textarea name="add-productDesc" required></textarea></td>
-        </tr>
-        <tr>
-            <td>Product Price:</td>
-            <td><input type="number" step="0.01" name="add-productPrice" required></td>
-        </tr>
-    </table>
-    <input type="submit" name="add-submit" value="Add Product">
-</form>
-
-<form method="post">
-    <h3>Update Product</h3>
-    <table>
-        <tr>
-            <td>Product Name:</td>
             <td><input type="text" name="productName" required></td>
         </tr>
         <tr>
