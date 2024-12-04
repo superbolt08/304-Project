@@ -209,6 +209,17 @@ String updateSQL = "UPDATE product SET productName = ?, categoryId = ?, productD
     <input type="submit" name="update-submit" value="Update Product">
 </form>
 
+<form method="post" name = "delete-submit">
+    <h3>Delete Product</h3>
+    <table>
+		<tr>
+            <td>Delete Product by Name:</td>
+            <td><input type="text" name="existingProductName" required></td>
+        </tr>
+    </table>
+    <input type="submit" name="delete-submit" value="Delete Product">
+</form>
+
 </body>
 </html>
 
