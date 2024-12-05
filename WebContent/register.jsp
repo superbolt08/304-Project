@@ -17,6 +17,7 @@
     </style>
 </head>
 <body>
+<h1>Register User / Forgot password</h1>
     <form name="MyForm" method="post" action="validateRegister.jsp" onsubmit="return validateForm()">
         <table>
             <tr>
