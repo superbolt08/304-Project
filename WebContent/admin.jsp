@@ -233,6 +233,10 @@ String deleteSQL = "DELETE product WHERE productName = ?";
             <td>Product Price:</td>
             <td><input type="number" step="0.01" name="productPrice" required></td>
         </tr>
+		<tr>
+            <td>Product Image:</td>
+            <td><input type="file" name="productImage" accept="image/*"></td>
+        </tr>
     </table>
     <input type="submit" name="update-submit" value="Update Product">
 </form>
