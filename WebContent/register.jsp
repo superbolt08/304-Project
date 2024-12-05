@@ -41,7 +41,7 @@
     }
 
     function adjustLabels() {
-        if (!sessionStorage.getItem("fromRegister")) {
+        if (sessionStorage.getItem("fromRegister") == 'false') {
             document.getElementById('usrnme-input-label').innerText = "New Username:";
             document.getElementById('pw-input-label').innerText = "New Password:";
         }

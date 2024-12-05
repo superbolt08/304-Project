@@ -31,7 +31,7 @@ if (session.getAttribute("loginMessage") != null)
 <input class="submit" type="submit" name="Submit2" value="Log In">
 </form>
 <br>
-<a href="register.jsp" onclick="(function(){sessionStorage.setItem('fromRegister', false)})()"><font face="Arial, Helvetica, sans-serif" size="2">Forgot user or password?</font></a>
+<a href="register.jsp" onclick="(function(){sessionStorage.setItem('fromRegister','false')})()"><font face="Arial, Helvetica, sans-serif" size="2">Forgot user or password?</font></a>
 
 </div>
 
