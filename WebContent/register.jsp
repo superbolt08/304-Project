@@ -11,6 +11,7 @@
 <% 
 //Register User
 String insertUserSQL = "INSERT INTO customer (email, userid, address, password) VALUES (?, ?, ?, ?)";
+String checkUserExistSQL = "SELECT COUNT(*) FROM customer WHERE email = ? OR userid = ?"; // Query to check if email or userid already exists
 if (request.getParameter("register-submit") != null) {
     String email = request.getParameter("email");
     String username = request.getParameter("username");
@@ -23,18 +24,29 @@ if (request.getParameter("register-submit") != null) {
         Statement stmt = con.createStatement();
         stmt.execute("USE orders"); // Select the database
 
-        PreparedStatement pstmt = con.prepareStatement(insertUserSQL);
+         // Check if email or userid already exists in the database
+        PreparedStatement checkStmt = con.prepareStatement(checkUserExistSQL);
+        checkStmt.setString(1, email);
+        checkStmt.setString(2, username);
+        ResultSet rs = checkStmt.executeQuery();
 
-        // Set parameters
-        pstmt.setString(1, email);
-        pstmt.setString(2, username);
-        pstmt.setString(3, address);
-        pstmt.setString(4, password);
+        if (rs.next() && rs.getInt(1) > 0) {
+            // If user with the same email or userid exists
+            out.println("<p>Error: A user with the same email or username already exists.</p>");
+        } else {
+            PreparedStatement pstmt = con.prepareStatement(insertUserSQL);
 
-        // Execute the insert query
-        int rowsInserted = pstmt.executeUpdate();
-        if (rowsInserted > 0) {
-            out.println("<p>User registered successfully!</p>");
+            // Set parameters
+            pstmt.setString(1, email);
+            pstmt.setString(2, username);
+            pstmt.setString(3, address);
+            pstmt.setString(4, password);
+
+            // Execute the insert query
+            int rowsInserted = pstmt.executeUpdate();
+            if (rowsInserted > 0) {
+                out.println("<p>User registered successfully!</p>");
+            }
         }
     } catch (SQLException ex) {
         out.println("<p>Error registering user: " + ex.getMessage() + "</p>");
@@ -59,8 +71,6 @@ if (request.getParameter("update-submit") != null) {
     String state = request.getParameter("state");
     String postalCode = request.getParameter("postalCode");
     String country = request.getParameter("country");
-    out.println("Email: " + email);
-    out.println("Username: " + username);
 
     try {
         // Establish database connection
