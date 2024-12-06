@@ -8,7 +8,7 @@
 <%@ include file="auth.jsp"%>
 <%@ page import="java.sql.*, java.text.NumberFormat" %>
 <%@ include file="jdbc.jsp" %>
-
+<%@ include file="header.jsp" %>
 <%
 	String userName = (String) session.getAttribute("authenticatedUser");
 %>

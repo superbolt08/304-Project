@@ -6,6 +6,7 @@
 <body>
 
 <div style="margin:0 auto;text-align:center;display:inline">
+<%@ include file="header.jsp" %>
 
 <h3>Please Login to System</h3>
 

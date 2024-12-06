@@ -3,7 +3,7 @@
 <%@ page import="java.util.Date" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
 <%@ include file="jdbc.jsp" %>
-
+<%@ include file="header.jsp" %>
 <html>
 <head>
 <title>Ray's Grocery - Product Information</title>

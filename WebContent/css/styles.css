@@ -23,16 +23,17 @@ header {
     border-radius: 10px;
     margin-bottom: 20px;
 }
-
 /* Content Styling */
 h1, h2, h3 {
     font-weight: 600; /* Semi-bold */
     margin-bottom: 15px;
+    font-family: 'Nunito', 'Arial', sans-serif;
 }
 
 p {
     margin-bottom: 15px;
     font-size: 1.1em;
+    font-family: 'Nunito', 'Arial', sans-serif;
 }
 
 /* Button Styling */

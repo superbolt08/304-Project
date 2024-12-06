@@ -13,7 +13,7 @@
 <title>Ray's Grocery Order Processing</title>
 </head>
 <body>
-
+<%@ include file="header.jsp" %>
 <% 
 // Get customer id
 String custId = request.getParameter("customerId");
