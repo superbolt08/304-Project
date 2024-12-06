@@ -104,35 +104,61 @@ try
 				if (rst3.next()) {
 					out.println("<h2 style='width:60%; margin:auto; padding: 20px 0px; background-color: rgba(0, 0, 0, 0.03);'>You've reviewed this product already! We appreciate you feedback!</h2>");
 				}
-				else { // otherwise, show the review form
-					out.println("<form method='post' name='prod-review' style='width:60%; margin:auto;'>"+
-								"<h3 align='left'>Review Product</h3>"+
-								"<div align='left'>"+
-									"<label for='rating'>Rating (from 1 to 5): </label>"+
-									"<input type='number' name='rating' min='1' max='5' value='1'>"+
-								"</div>"+
-								"<br>"+
-								"<textarea type='text' name='review' rows='5' style='resize:none; width:100%;' placeholder='Leave a comment' maxlength='1000'></textarea>"+
-								"<input type='submit' name='prodreview-submit' value='Submit'><input type='reset' value='Clear'>"+
-							"</form>"+
-							"<br>");
+				else { // otherwise, check if they have purchased this item before
+					String checkIfPurchased = "SELECT * FROM OrderSummary os JOIN OrderProduct op ON os.orderId = op.orderId "
+											+ "WHERE customerId = ? and productId = ?";
+					PreparedStatement ptmtCheckIfPrchsd = con.prepareStatement(checkIfPurchased);
+					ptmtCheckIfPrchsd.setInt(1, cid);
+					ptmtCheckIfPrchsd.setInt(2, Integer.parseInt(productId));
+					ResultSet rst4 = ptmtCheckIfPrchsd.executeQuery();
+					if (!rst4.next()) {	// if they havent, then show message saying need to purchase before review
+						out.println("<div style='width:60%; margin:auto; position:relative;'>"+
+										"<div style='filter:blur(3px); padding:5px;'>"+
+											"<h3 align='left' style='margin-top:0;'>Review Product</h3>"+
+											"<div align='left' style='display: flex;'>"+
+												"<span>Rating (from 1 to 5): </span>"+
+												"<div style='width:30px; height:18px;  border: solid 1px; margin-left: 10px;'></div>"+
+											"</div>"+
+											"<br>"+
+											"<div style='width:100%; height:70px; border: solid 1px;'></div>"+
+											"<button>Submit</button><button>Clear</button>"+
+										"</div>"+
+										"<div style='position:absolute; top:0; width:100%; height:100%; background-color: rgba(0, 0, 0, 0.015);'>"+
+											"<h2 style='position:absolute; margin:0; left:0; right:0; top:40%;'>Purchase item to leave a review!</h2>"+
+										"</div>"+
+									"</div>"+
+									"<br>");
+					}
+					else { // if they have, then show the form for leaving review
+						out.println("<form method='post' name='prod-review' style='width:60%; margin:auto;'>"+
+										"<h3 align='left'>Review Product</h3>"+
+										"<div align='left'>"+
+											"<label for='rating'>Rating (from 1 to 5): </label>"+
+											"<input type='number' name='rating' min='1' max='5' value='1'>"+
+										"</div>"+
+										"<br>"+
+										"<textarea type='text' name='review' rows='5' style='resize:none; width:100%;' placeholder='Leave a comment' maxlength='1000'></textarea>"+
+										"<input type='submit' name='prodreview-submit' value='Submit'><input type='reset' value='Clear'>"+
+									"</form>"+
+									"<br>");
 
-					// sql query for insert new review
-					String insertReview = "INSERT INTO Review (reviewRating, reviewDate, customerId, productId, reviewComment) VALUES (?, ?, ?, ?, ?)";
+						// sql query for insert new review
+						String insertReview = "INSERT INTO Review (reviewRating, reviewDate, customerId, productId, reviewComment) VALUES (?, ?, ?, ?, ?)";
 
-					if (request.getParameter("prodreview-submit") != null && cid != null) {
-						PreparedStatement pstmtInsertRvw = con.prepareStatement(insertReview);
+						if (request.getParameter("prodreview-submit") != null && cid != null) {
+							PreparedStatement pstmtInsertRvw = con.prepareStatement(insertReview);
 
-						// Set parameters
-						pstmtInsertRvw.setInt(1, Integer.parseInt(request.getParameter("rating"))); // review rating
-						pstmtInsertRvw.setTimestamp(2, new java.sql.Timestamp(new Date().getTime())); // review date
-						pstmtInsertRvw.setInt(3, cid);					// customer id
-						pstmtInsertRvw.setInt(4, Integer.parseInt(productId));		// product id
-						pstmtInsertRvw.setString(5, request.getParameter("review")); // review comment
+							// Set parameters
+							pstmtInsertRvw.setInt(1, Integer.parseInt(request.getParameter("rating"))); // review rating
+							pstmtInsertRvw.setTimestamp(2, new java.sql.Timestamp(new Date().getTime())); // review date
+							pstmtInsertRvw.setInt(3, cid);					// customer id
+							pstmtInsertRvw.setInt(4, Integer.parseInt(productId));		// product id
+							pstmtInsertRvw.setString(5, request.getParameter("review")); // review comment
 
-						// Execute the insert query
-						pstmtInsertRvw.executeUpdate();
-					}					
+							// Execute the insert query
+							pstmtInsertRvw.executeUpdate();
+						}	
+					}				
 				}
 			}
 			else {
