@@ -23,7 +23,7 @@
 <%
 	String userName = (String) session.getAttribute("authenticatedUser");
 	if (userName != null)
-		out.println("<h3 align=\"center\">Signed in as: "+userName+"</h3>");
+		out.println("<h3 align=\"center\">Welcome "+userName+"!</h3>");
 %>
 </body>
 </head>

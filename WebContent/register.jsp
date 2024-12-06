@@ -239,7 +239,7 @@ if (request.getParameter("password-submit") != null) {
             <td><input type="text" name="address" maxlength="20" required></td>
         </tr>
         <tr>
-            <td>Password:</td>
+            <td>New Password:</td>
             <td><input type="password" name="password" maxlength="10" required></td>
         </tr>
     </table>
