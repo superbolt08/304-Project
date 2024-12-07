@@ -63,7 +63,7 @@ try
 								+ "&price=" + rst.getDouble(3)+"\">Add to Cart</a></h3>");		
 		
 		out.println("<h3><a href=\"listprod.jsp\">Continue Shopping</a>");
-
+	// review system
 	// 	// check if user is signed in, if not signed in, dont show form and instead, show message saying need to sign in to review product
 	// 	if (session.getAttribute("authenticatedUser") == null) {
 	// 		out.println("<div style='width:60%; margin:auto; position:relative;'>"+
